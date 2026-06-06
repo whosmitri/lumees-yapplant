@@ -126,7 +126,6 @@
 %%
 % ferramenta do pacote abnTeX para fazer resumo em português (também escreve automaticamente a palavra "Resumo" centralizada e em negrito no topo)
 \begin{resumoumacoluna}
-
  Aqui vai o resumo !!
 
  % separa o texto do resumo da linha de palavras-chave:
@@ -163,7 +162,6 @@
 % section*: o * (asterisco) cria o título, mas não coloca número
 % o asterisco escondeu o número, este comando força sua inserção no sumário:
 \addcontentsline{toc}{section}{Introdução}
-
 O avanço da Internet das Coisas (IoT) e das tecnologias de desenvolvimento web e mobile possibilita a criação de soluções integradas voltadas para o monitoramento ambiental e automação residencial. No contexto do cuidado botânico doméstico, a manutenção de plantas enfrenta desafios relacionados à falta de acompanhamento em tempo real e à ausência de diagnósticos preditivos baseados nas condições do ecossistema. 
 
 Este projeto propõe o desenvolvimento de um ecossistema inteligente que une hardware, computação em nuvem e inteligência artificial para monitorar a saúde de plantas de forma interativa. Utilizando o conceito de gamificação inspirado em bichinhos virtuais (estilos \textit{Tamagotchi}), o sistema converte variáveis físicas em estados visuais intuitivos de humor e bem-estar, tornando o cuidado diário uma experiência mais acessível e engajadora.
@@ -195,12 +193,9 @@ Desenvolver um sistema integrado de IoT, aplicação mobile e Inteligência Arti
 \end{itemize}
 %--
 % ---
-%
-%\newpage
 
 % --- METODOLOGIA
 \section{Metodologia}
-
 A metodologia deste projeto está dividida em quatro fases estruturais executadas de forma ágil e paralela:
 
 \begin{enumerate}
@@ -216,13 +211,16 @@ A metodologia deste projeto está dividida em quatro fases estruturais executada
 
 % -- Arquitetura Geral
 \subsection{Arquitetura Geral}
-O ecossistema do projeto é baseado em uma arquitetura de quatro camadas integradas para coleta, processamento, persistência e visualização de dados:
+O sistema é estruturado em quatro camadas principais que trabalham de forma integrada: o Hardware (sensores), o Backend (servidor e inteligência artificial), o Banco de Dados (armazenamento) e o Frontend (aplicativo móvel). Essa divisão garante que cada parte do projeto tenha uma função específica e isolada, facilitando a manutenção e a comunicação dos dados.
 
 \begin{enumerate}
-    \item \textbf{Camada de Captura (Hardware):} Composta pelo microcontrolador ESP32 conectado aos sensores DHT11 (temperatura e umidade do ar), BH1750 (luminosidade em Lux) e um sensor de umidade de solo. O dispositivo realiza a leitura periódica das variáveis e as transmite via requisições HTTP POST em formato JSON.
-    %\item \textbf{Camada de Processamento (Backend e IA):} Uma API desenvolvida em Python com o framework FastAPI recebe a telemetria do hardware. O backend infere a estação do ano e o período do dia (utilizando dados de geolocalização e a API \textit{sunrise-sunset}). Na sequência, esses atributos alimentam um modelo de Machine Learning baseado no algoritmo KNN (\textit{K-Nearest Neighbors}) para classificar o estado atual da planta e gerar uma porcentagem de confiança da predição.
-    %\item \textbf{Camada de Persistência (Banco de Dados):} Os dados brutos e o diagnóstico preditivo da IA são enviados pelo backend para o banco de dados NoSQL Firebase Firestore. A estrutura utiliza coleções para dados cadastrais (`usuarios`, `plantas` e `especies\_catalogo`) e subcoleções (`historico\_leituras` e `previsoes\_ia`) atreladas ao ID de cada planta.
-    \item \textbf{Camada de Visualização (Frontend Mobile):} Uma aplicação mobile desenvolvida em Flutter conecta-se nativamente ao Firebase Firestore. A interface renderiza o estado da planta em tempo real no formato de um bichinho virtual, alterando dinamicamente o avatar (feliz, com sede, encharcado, calor ou frio) com base nas condições propostas no backend.
+    \item \textbf{Camada de Captura (Hardware):} Composta pelo microcontrolador ESP32 e sensores físicos. Esta camada é responsável por medir as variáveis do ambiente (como a umidade do solo e a temperatura) e enviar esses dados brutos para o Backend através de requisições na rede.
+    %
+    \item \textbf{Camada de Processamento (Backend e IA):} Desenvolvida em Python com o framework FastAPI. É o "cérebro" do sistema. O Backend recebe os dados enviados pelo Hardware, analisa e trata os dados brutos, classifica um estado de saúde da planta (ex: se está saudável, com sede ou encharcada) e envia para o Banco de Dados.
+    %
+    \item \textbf{Camada de Persistência (Banco de Dados):} Gerenciada pelo Firebase. Esta camada armazena de forma estruturada todo o histórico de leituras dos sensores, os diagnósticos gerados pela Inteligência Artificial e as informações de cadastro dos usuários, servindo como a fonte central de dados do projeto.
+    %
+    \item \textbf{Camada de Visualização (Frontend Mobile):} Desenvolvida em Flutter. É a interface gráfica (aplicativo mobile) com a qual o usuário interage. Ela consome os dados armazenados no Banco de Dados e as respostas em tempo real da API para exibir gráficos, alertas de saúde da planta e painéis de controle de forma visual e intuitiva.
 \end{enumerate}
 % --
 
@@ -239,17 +237,21 @@ Imagem do fluxograma
 
 % --- HARDWARE
 \section{Desenvolvimento do Hardware e IoT}
+Texto
 
 % -- Componentes Utilizados
 \subsection{Componentes Utilizados}
+Lista
 % --
 
 % -- Esquema
 \subsection{Esquema Elétrico e Montagem do Circuito}
+Imagem
 % --
 
 % -- Integração
 \subsection{Integração por API}
+Texto
 % --
 % ---
 
@@ -258,22 +260,60 @@ Imagem do fluxograma
 
 % -- Motivo da Escolha
 \subsection{O Algoritmo KNN}
+O algoritmo \textit{K-Nearest Neighbors} (K-Vizinhos Mais Próximos, ou KNN) foi escolhido para este projeto por ser um modelo de aprendizado supervisionado simples e altamente eficiente para problemas de classificação. Como o objetivo do sistema é categorizar o estado de saúde da planta em classes bem definidas (como "Crítico", "Razoável" ou "Excelente"), o KNN se destaca por não exigir um treinamento matemático complexo. Ele funciona comparando os dados atuais recebidos pelos sensores com os dados históricos guardados em sua memória, classificando a planta com base nas características dos vizinhos mais próximos.
 % --
 
 % -- Dados para Treinamento
 \subsection{Geração de Dados Sintéticos}
+Para treinar o modelo de Inteligência Artificial, foi necessária a criação de um banco de dados inicial. Como o projeto ainda não possuía semanas de leituras reais acumuladas, foi realizado um processo de geração de dados sintéticos (dados simulados artificialmente via código). Esses dados foram gerados com base em estudos botânicos reais, simulando cenários ideais de umidade e situações de estresse hídrico para as plantas. Esse processo garantiu uma base de dados volumosa e equilibrada, essencial para que a IA aprendesse a diferenciar corretamente cada estado de saúde antes de ir para o ambiente real.
 % --
 
 % -- Variáveis
 \subsection{Variáveis Ambientais Consideradas}
+O modelo de Inteligência Artificial não toma decisões baseada apenas em um número isolado. Para garantir uma análise mais precisa, o algoritmo cruza duas variáveis ambientais fundamentais extraídas do histórico de monitoramento:
+%
+\begin{itemize}
+    \item \textbf{Umidade Atual do Solo (Bruta):} A leitura instantânea feita pelo sensor de umidade no momento exato da requisição. Ela indica o estado presente da terra.
+    %
+    \item \textbf{Média de Umidade dos Últimos 7 Dias:} O histórico acumulado de umidade daquela planta na última semana. Essa variável é crucial porque permite que a IA entenda a tendência do solo, diferenciando uma rega recente de um solo que está constantemente encharcado ou seco.
+\end{itemize}
 % --
 
 % -- Treinamento + Avaliação
 \subsection{Treinamento e Avaliação do Modelo}
+O desenvolvimento do modelo (apelidado carinhosamente de "Lee") foi realizado em ambiente Python. O banco de dados sintético foi dividido em duas partes: uma para o treinamento do algoritmo (80\% dos dados) e outra menor para a realização de testes (20\% dos dados). Durante a etapa de avaliação, o modelo apresentou excelentes métricas de desempenho (como altos índices de acurácia e precisão), provando ser capaz de classificar os estados de saúde sem confusões entre as classes. Após a validação do sucesso dos testes, o modelo treinado foi exportado e salvo em um arquivo de formato \textit{.pkl} (Pickle), permitindo que ele seja facilmente carregado e utilizado pelo Backend a qualquer momento.
 % --
 
 % -- Estrutura de Status
 \subsection{Estrutura Condicional de Status}
+O modelo KNN (Lee) trabalha classificando os dados em rótulos previsíveis, mas esses dados brutos não são amigáveis para o usuário final do aplicativo. Por isso, a API possui uma camada interna de tratamento de dados que funciona como um "tradutor" de estados.
+
+Logo após o modelo KNN definir a classificação da planta, o Backend executa uma estrutura condicional (blocos \textit{if/else}) para associar o resultado técnico a uma resposta humanizada. Essa estrutura define duas saídas principais:
+
+\begin{itemize}
+    \item \textbf{Estado Classificado (Status):} A simplificação do diagnóstico em palavras-chave que alteram a interface do aplicativo, como "Excelente", "Crítico" ou "Razoável".
+    %
+    \item \textbf{Texto Explicativo:} Uma mensagem personalizada e amigável que explica ao usuário se os cuidados estão atendendo à planta ou se há necessidade de atenção maior e replanejamento de cuidados.
+\end{itemize}
+% --
+
+% -- Fluxo de Dados
+\subsection{Fluxo de Dados}
+A execução da Inteligência Artificial dentro do ecossistema do projeto segue um fluxo integrado e automatizado entre o aplicativo, o Backend e o banco de dados. O ciclo funciona da seguinte forma:
+
+\begin{enumerate}
+    \item \textbf{Solicitação:} O usuário entra no aplicativo e solicita a análise de saúde da sua planta.
+    %
+    \item \textbf{Identificação:} O Backend recebe a requisição contendo o identificador da espécie (\texttt{id\_especie}).
+    %
+    \item \textbf{Busca de Dados:} O Backend conecta-se ao Firebase e busca as informações em tempo real de \texttt{umidade\_solo\_bruto} e \texttt{umidade\_ha\_7\_dias} associadas à conta do usuário (\texttt{uid}) e àquela planta específica.
+    %
+    \item \textbf{Processamento da IA:} O Backend aciona o modelo Lee (\textit{.pkl}), enviando os dados recuperados do banco para que o algoritmo KNN faça a classificação do estado.
+    %
+    \item \textbf{Aplicação da Lógica:} Com o resultado da classificação da IA em mãos, o Backend aplica uma estrutura condicional para selecionar a mensagem de texto explicativa correspondente àquela situação (ex: um alerta amigável de socorro ou um parabéns pelo cuidado).
+    %
+    \item \textbf{Retorno:} O Backend devolve uma resposta contendo o status de saúde e o texto personalizado para o aplicativo do usuário correspondente.
+\end{enumerate}
 % --
 % ---
 
@@ -298,6 +338,28 @@ Imagem do fluxograma
 
 % -- UX/UI
 \subsection{Fluxo de Navegação e Usabilidade (UX/UI)}
+O fluxo de navegação do aplicativo foi projetado para ser intuitivo, garantindo que o usuário acesse as informações de saúde da sua planta com o menor número de cliques possível. A jornada dentro do ecossistema mobile foi estruturada nas seguintes etapas sequenciais:
+
+\begin{enumerate}
+    \item \textbf{Boas-Vindas:} O usuário interage inicialmente com a Tela Inicial, que apresenta uma mensagem de boas-vindas e o botão "Começar".
+    \item \textbf{Autenticação:} Ao avançar, o sistema direciona o usuário para a tela de autenticação, permitindo a escolha entre Criar Conta (para o primeiro acesso) ou o Login (para quem já possui uma conta ativa).
+    \item \textbf{Tela Principal Dinâmica:} Após a validação do acesso, o usuário entra na Tela Principal. Esta tela possui uma lógica condicional inteligente baseada no banco de dados:
+    \begin{itemize}
+        \item \textit{Sem planta cadastrada:} A interface esconde o avatar da planta e exibe um cartão (\textit{card}) de destaque solicitando o cadastro do primeiro dispositivo e da espécie.
+        \item \textit{Com planta cadastrada:} O cartão de aviso desaparece, dando lugar ao avatar gráfico da planta, que muda de expressão de acordo com o estado de saúde atual.
+    \end{itemize}
+    \item \textbf{Configuração de Rede (Wi-Fi):} Para que os dados comecem a ser transmitidos, o usuário precisa conectar o hardware à rede local. Caso seja a primeira vez, o aplicativo oferece instruções claras na tela de configurações para realizar esse vínculo; se a rede já estiver configurada, o sistema inicia a comunicação automaticamente.
+\end{enumerate}
+
+Uma vez estabelecida a conexão e o sensor inserido no solo, o usuário ganha acesso livre para navegar pelas cinco telas principais de gerenciamento do aplicativo:
+
+\begin{itemize}
+    \item \textbf{Monitoramento em Tempo Real (Tela Principal):} Exibe os dados instantâneos enviados pelos sensores e as reações visuais da planta.
+    \item \textbf{Análise Histórica (Tela Dashboard):} Apresenta gráficos contendo as leituras coletadas nas últimas 5 horas, permitindo acompanhar a evolução recente do ambiente.
+    \item \textbf{Diagnóstico Avançado (Tela Diagnóstico IA):} Espaço onde o usuário pode solicitar manualmente uma análise aprofundada para o modelo de Inteligência Artificial (Lee).
+    \item \textbf{Exportação de Dados (Tela Relatório):} Permite gerar e baixar um arquivo em formato CSV com o histórico completo de medições dos últimos 15 dias.
+    \item \textbf{Gerenciamento do Perfil (Tela de Usuário):} Painel onde é possível visualizar e editar dados pessoais (nome, e-mail e senha), gerenciar permissões de privacidade do sistema (como o uso da localização) e consultar o manual de instruções de configuração do Wi-Fi.
+\end{itemize}
 % --
 
 % -- Elementos Visuais
@@ -306,18 +368,44 @@ Imagem do fluxograma
 
 % -- Detalhe das Telas
 \subsection{Detalhamento das Telas Desenvolvidas}
+
+\subsubsection{Telas de Acesso (Inicial, Login e Cadastro)}
+A jornada se inicia na \textbf{Tela Inicial}, uma interface limpa com foco em conversão que apresenta a marca do projeto e direciona o usuário ao fluxo de entrada. A \textbf{Tela de Login} e a \textbf{Tela de Cadastro} possuem campos validados para inserção de credenciais (e-mail e senha). O cadastro armazena as informações básicas no Firebase para criar o perfil único do usuário (\texttt{uid}).
+
+\subsubsection{Tela Principal (Monitoramento Real-Time)}
+Esta é a tela de maior permanência do usuário. Ela consome dados diretamente do banco de dados para renderizar seu conteúdo de forma dinâmica. Caso o sistema identifique que o usuário não possui um dispositivo atrelado, exibe-se um cartão de ação (\textit{card}) centralizado para o cadastro. Havendo um dispositivo ativo, a tela exibe os dados de leitura instantânea dos sensores e o avatar gráfico da planta, cujo estado visual (expressão e animação) responde diretamente aos dados de saúde calculados pelo Backend.
+
+\subsubsection{Tela Dashboard (Gráficos Históricos)}
+Voltada para a análise de tendências, esta tela organiza as leituras brutas capturadas pelos sensores em uma linha do tempo retroativa de até 5 horas. Os dados são plotados em gráficos de linha dinâmicos, permitindo que o usuário visualize de forma simples se a umidade e a temperatura do ambiente estão se mantendo estáveis ou se apresentam picos de anomalia.
+
+\subsubsection{Tela de Diagnóstico da Inteligência Artificial}
+Esta interface funciona como um painel de consulta avançada. Nela, o usuário encontra um botão de ação rápida para disparar uma requisição de análise. Ao ser acionada, a tela exibe o veredito do modelo KNN (Lee) de forma destacada (ex: "Crítico", "Saudável") acompanhado do bloco de texto explicativo gerado pela API.
+
+\subsubsection{Tela de Relatório (Exportação CSV)}
+Uma tela utilitária projetada para usuários que necessitam de um registros mais profundos. Ela exibe um botão para exportar e baixar uma tabela estruturada em formato CSV contendo todas as medições coletadas nos últimos 15 dias, facilitando o compartilhamento e a leitura externa dos dados.
+
+\subsubsection{Tela de Configurações e Usuário}
+Interface administrativa dividida em três blocos principais de controle:
+\begin{itemize}
+    \item \textbf{Dados do Perfil:} Permite a edição segura de nome, e-mail e redefinição de senha.
+    \item \textbf{Privacidade e Permissões:} Chaves de ativação de recursos do sistema, como a permissão para uso da localização do dispositivo mobile.
+    \item \textbf{Suporte Técnico (Wi-Fi):} Mini guia com instruções para que o usuário saiba como parear o hardware do sensor à rede sem fio local.
+\end{itemize}
 % --
 % ---
 
 % Finaliza a parte no bookmark do PDF, para que se inicie o bookmark na raiz
-\bookmarksetup{startatroot}
+%\bookmarksetup{startatroot}
 % ---
 
 % --- CONCLUSÃO
 \section*{Conclusão e Trabalhos Futuros}
+\addcontentsline{toc}{section}{Conclusão e Trabalhos Futuros}
+Super texto da conclusão
 
 % -- Melhorias Futuras
 \subsection{Propostas de Melhorias Futuras}
+Melhorias
 % --
 % ---
 
