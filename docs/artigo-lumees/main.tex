@@ -1,0 +1,300 @@
+\documentclass[
+    % -- opções da classe memoir --
+    % tamanho da fonte:
+	12pt,
+    % define que é um artigo científico:
+	article,
+    % para impressão apenas em um lado da página:
+	oneside,
+    % tamanho do papel:
+	a4paper,
+	% -- opções do pacote babel --
+    % idioma adicional para hifenização e abstract:
+	english,
+    % o idioma principal do documento:
+	brazil
+	]{abntex2}
+
+
+
+% PACOTES
+
+% -- Pacotes fundamentais --
+% Usa a fonte Latin Modern
+\usepackage{lmodern}
+% Selecao de codigos de fonte:
+\usepackage[T1]{fontenc}
+% Codificacao do documento (conversão automática dos acentos):
+\usepackage[utf8]{inputenc}
+% Indenta o primeiro parágrafo de cada seção:
+\usepackage{indentfirst}
+% Lista de simbolos:
+\usepackage{nomencl}
+% Controle das cores:
+\usepackage{color}
+% Inclusão de gráficos:
+\usepackage{graphicx}
+% para melhorias de justificação:
+\usepackage{microtype}
+% ---
+
+% -- Pacotes de citações --
+% Citações padrão ABNT:
+\usepackage[alf]{abntex2cite}
+% ---
+
+% INFORMAÇÕES DO ARTIGO
+\titulo{Sistema Inteligente de Monitoramento e \\ Cuidados de Plantas}
+\tituloestrangeiro{}
+\autor{Gaisani Calle \and Dimas Vianna}
+\local{[São Paulo - Brasil]}
+\data{2026}
+% ---
+
+% ---
+% CONFIGURAÇÕES DE APARÊNCIA DO PDF FINAL
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+% 'makeatletter' destrava o uso do '@' para configuração, enquanto o 'makeatother' trava novamente
+\makeatletter
+\hypersetup{
+        % -- configurações de PDF --
+     	% configura o título do pdf
+		pdftitle={\@title}, 
+        % configura o autor do pdf
+		pdfauthor={\@author},
+        % breve descrição ou o tema principal do documento:
+    	pdfsubject={Modelo de artigo científico com abnTeX2},
+        % nome da ferramenta ou software original utilizado para gerar ou exportar o arquivo original:
+	    pdfcreator={LaTeX with abnTeX2},
+        % lista de palavras-chave para otimização de busca online:
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{atigo científico},
+        %
+        % -- edição de links --
+        % adiciona cor em vez de colocar caixas ou bordas coloridas:
+		colorlinks=true,
+        % cor de links internos:
+    	linkcolor=blue,
+        % cor de links da bibliografia:
+    	citecolor=blue,
+        % cor de link de arquivos:
+    	filecolor=magenta,
+        % cor de URLs:
+		urlcolor=blue,
+        % cria menu de navegação later lateral de até 4 níveis:
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% EDITANDO MARGEM
+% set lr (left/right): fixa as margens da direita e esquerda em 3cm e o * calcula o restante do espaço na página
+\setlrmarginsandblock{3cm}{3cm}{*}
+% set ul (upper/lower): fixa as margens de cima e de baixo em 3cm
+\setulmarginsandblock{3cm}{3cm}{*}
+% atualiza o arquivo com base nas novas configurações de margem
+\checkandfixthelayout
+% ---
+
+% ESPAÇAMENTO DE LINHAS E PARÁGRAFOS
+% recuo na primeira linha de um parágrafo:
+\setlength{\parindent}{1.3cm}
+
+% controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}
+
+% define o espaçamento entre as linhas do seu artigo como simples:
+\SingleSpacing
+% \onelineskip % espaçamento entre linhas para trabalhos maiores (como TCCs e teses)
+
+
+% INÍCIO DO DOCUMENTO
+
+% inicia o documento em PDF:
+\begin{document}
+
+% retira espaço extra obsoleto entre as frases:
+\frenchspacing 
+
+% ELEMENTOS PRÉ-TEXTUAIS
+
+% captura as informações do Preâmbulo e monta o cabeçalho inicial do artigo na primeira página:
+\maketitle
+%%
+% ferramenta do pacote abnTeX para fazer resumo em português (também escreve automaticamente a palavra "Resumo" centralizada e em negrito no topo)
+\begin{resumoumacoluna}
+
+ Aqui vai o resumo !!
+
+ % separa o texto do resumo da linha de palavras-chave:
+ \vspace{\onelineskip}
+ 
+ % No Indentation (Sem Recuo):
+ \noindent
+ 
+ \textbf{Palavras-chaves}: latex. abntex. editoração de texto.
+\end{resumoumacoluna}
+% ---
+
+% SUMÁRIO
+% cria uma marcação invisível no PDF para o menu lateral reconhecer o Sumário
+\pdfbookmark[0]{\contentsname}{toc}
+% 'pdfbookmark': comando do pacote hyperref que insere o marcador no PDF
+% [0]: nível hierárquico do marcador, indica o nível mais alto
+% {\contentsname}: texto que aparecerá na barra lateral. em português, o LaTeX substitui essa variável automaticamente por "Sumário"
+% {toc}: Table of Contents. indica onde a página deve pular ao ser clicada
+
+% imprime o Sumário formatado automaticamente pela ABNT
+\tableofcontents
+
+% limpa a página para que a Introdução comece em uma folha nova e limpa
+\cleardoublepage
+% ---
+
+
+% ELEMENTOS TEXTUAIS
+\textual
+
+% --- INTRODUÇÃO
+\section*{Introdução}
+% section*: o * (asterisco) cria o título, mas não coloca número
+% o asterisco escondeu o número, este comando força sua inserção no sumário:
+\addcontentsline{toc}{section}{Introdução}
+
+O avanço da Internet das Coisas (IoT) e das tecnologias de desenvolvimento web e mobile possibilita a criação de soluções integradas voltadas para o monitoramento ambiental e automação residencial. No contexto do cuidado botânico doméstico, a manutenção de plantas enfrenta desafios relacionados à falta de acompanhamento em tempo real e à ausência de diagnósticos preditivos baseados nas condições do ecossistema. 
+
+Este projeto propõe o desenvolvimento de um ecossistema inteligente que une hardware, computação em nuvem e inteligência artificial para monitorar a saúde de plantas de forma interativa. Utilizando o conceito de gamificação inspirado em bichinhos virtuais (estilos \textit{Tamagotchi}), o sistema converte variáveis físicas em estados visuais intuitivos de humor e bem-estar, tornando o cuidado diário uma experiência mais acessível e engajadora.
+
+% Texto para introdução\footnote{teste super legal}.
+% \emph{Segundo} parágrafo para \textsf{introdução} !!
+% ---
+
+% --- PROBLEMA IDENTIFICADO
+\section{Problema Identificado}
+A manutenção da saúde de plantas em ambientes residenciais internos apresenta desafios práticos devido à invisibilidade de variáveis ambientais importantes. Fatores como a oscilação da umidade do solo, variações térmicas e níveis inadequados de luminosidade (Lux) frequentemente resultam em desidratação, excesso de rega ou estresse lumínico antes que os sinais físicos sejam visíveis na planta. Além disso, as necessidades hídricas e climáticas alteram-se drasticamente dependendo da estação do ano (verão/primavera e inverno/outono) e do período do dia (diurno/noturno). A ausência de um mecanismo acessível que centralize esses dados e os converta em diagnósticos preventivos dificulta o cuidado correto por parte dos usuários.
+% ----
+
+% --- OBJETIVOS
+\section{Objetivos}
+
+% -- Objetivo Geral
+\subsection{Objetivo Geral}
+Desenvolver um sistema integrado de IoT, aplicação mobile e Inteligência Artificial para monitoramento residencial de plantas, capaz de coletar dados ambientais em tempo real e classificar o estado de saúde da planta através de um modelo preditivo.
+% --
+
+% -- Objetivos Específicos
+\subsection{Objetivos Específicos}
+\begin{itemize}
+    \item Construir um módulo de hardware utilizando o microcontrolador ESP32 integrado aos sensores DHT11, BH1750 e higrômetro de solo para medição automatizada de temperatura e umidade do ar, luminosidade e umidade da terra.
+    \item Desenvolver uma API em Python utilizando o framework FastAPI para o recebimento de dados de telemetria, processamento de inteligência artificial e persistência de dados.
+    \item Implementar um modelo de Machine Learning baseado no algoritmo KNN (\textit{K-Nearest Neighbors}) para classificar a saúde da planta em tempo real a partir do histórico de dados.
+    \item Desenvolver uma interface mobile responsiva via Flutter integrada nativamente ao banco de dados Firebase Firestore para visualização dos parâmetros da planta.
+\end{itemize}
+%--
+% ---
+%
+%\newpage
+
+% --- METODOLOGIA
+\section{Metodologia}
+
+A metodologia deste projeto está dividida em quatro fases estruturais executadas de forma ágil e paralela:
+
+\begin{enumerate}
+    \item \textbf{Modelagem e Infraestrutura de Dados:} Criação e configuração de um banco de dados NoSQL utilizando o Firebase Firestore, definindo as coleções de usuários, plantas e histórico de leituras. Geração de uma base de dados sintéticos para simular o histórico ambiental de 30 dias necessário para o aprendizado da IA.
+    \item \textbf{Desenvolvimento da Inteligência Artificial e Backend:} Treinamento do modelo de classificação KNN em Python com suporte da biblioteca \textit{scikit-learn}. Construção de uma API com FastAPI para hospedar o modelo e centralizar a comunicação entre os dispositivos e o banco de dados.
+    \item \textbf{Construção do Hardware e Calibragem:} Montagem do circuito físico eletrônico baseado no ESP32. Realização da calibração do sensor higrômetro de solo em ambientes secos e saturados de água para garantir a acurácia dos dados enviados por requisições HTTP POST.
+    \item \textbf{Desenvolvimento Frontend e Integração Geral:} Construção das telas da aplicação (Autenticação, Dashboard, Visualização da Planta e Relatórios CSV) na ferramenta FlutterFlow, conectando as variáveis do Firebase à interface para permitir atualizações visuais em tempo real baseadas no diagnóstico do modelo preditivo.
+\end{enumerate}
+% ---
+
+% --- ARQUITETURA DO SISTEMA
+\section{Arquitetura do Sistema}
+
+% -- Arquitetura Geral
+\subsection{Arquitetura Geral}
+O ecossistema do projeto é baseado em uma arquitetura de quatro camadas integradas para coleta, processamento, persistência e visualização de dados:
+
+\begin{enumerate}
+    \item \textbf{Camada de Captura (Hardware):} Composta pelo microcontrolador ESP32 conectado aos sensores DHT11 (temperatura e umidade do ar), BH1750 (luminosidade em Lux) e um sensor de umidade de solo. O dispositivo realiza a leitura periódica das variáveis e as transmite via requisições HTTP POST em formato JSON.
+    %\item \textbf{Camada de Processamento (Backend e IA):} Uma API desenvolvida em Python com o framework FastAPI recebe a telemetria do hardware. O backend infere a estação do ano e o período do dia (utilizando dados de geolocalização e a API \textit{sunrise-sunset}). Na sequência, esses atributos alimentam um modelo de Machine Learning baseado no algoritmo KNN (\textit{K-Nearest Neighbors}) para classificar o estado atual da planta e gerar uma porcentagem de confiança da predição.
+    %\item \textbf{Camada de Persistência (Banco de Dados):} Os dados brutos e o diagnóstico preditivo da IA são enviados pelo backend para o banco de dados NoSQL Firebase Firestore. A estrutura utiliza coleções para dados cadastrais (`usuarios`, `plantas` e `especies\_catalogo`) e subcoleções (`historico\_leituras` e `previsoes\_ia`) atreladas ao ID de cada planta.
+    \item \textbf{Camada de Visualização (Frontend Mobile):} Uma aplicação mobile desenvolvida em Flutter conecta-se nativamente ao Firebase Firestore. A interface renderiza o estado da planta em tempo real no formato de um bichinho virtual, alterando dinamicamente o avatar (feliz, com sede, encharcado, calor ou frio) com base nas condições propostas no backend.
+\end{enumerate}
+% --
+
+% -- Banco de Dados
+\subsection{Diagrama de Dados}
+Imagem do nosso diagrama
+% --
+
+% -- Fluxo de Dados
+\subsection{Fluxo de Dados}
+Imagem do fluxograma
+% --
+% ---
+
+
+\begin{citacao}
+
+\end{citacao}
+
+
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+\bibliography{abntex2-modelo-references}
+
+% ----------------------------------------------------------
+% Glossário
+% ----------------------------------------------------------
+%
+% Há diversas soluções prontas para glossário em LaTeX. 
+% Consulte o manual do abnTeX2 para obter sugestões.
+%
+%\glossary
+
+% ----------------------------------------------------------
+% Apêndices
+% ----------------------------------------------------------
+
+% ---
+% Inicia os apêndices
+% ---
+\begin{apendicesenv}
+
+% ----------------------------------------------------------
+\chapter{Nullam elementum urna vel imperdiet sodales elit ipsum pharetra ligula
+ac pretium ante justo a nulla curabitur tristique arcu eu metus}
+% ----------------------------------------------------------
+
+\end{apendicesenv}
+% ---
+
+% ----------------------------------------------------------
+% Anexos
+% ----------------------------------------------------------
+\cftinserthook{toc}{AAA}
+% ---
+% Inicia os anexos
+% ---
+%\anexos
+\begin{anexosenv}
+
+% ---
+\chapter{Cras non urna sed feugiat cum sociis natoque penatibus et magnis dis
+parturient montes nascetur ridiculus mus}
+% ---
+
+\end{anexosenv}
+
+\end{document}
