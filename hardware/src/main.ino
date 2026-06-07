@@ -1,6 +1,7 @@
 #include <Wire.h> // habilita comunicação I2C (Inter-Integrated Circuit)
 #include <DHT.h> // biblioteca para configurar DHT11
 #include <BH1750.h> // biblioteca para configurar BH1750
+#include <WiFi.h> // necessária para ler o chip de WiFi e o MAC
 
 // MAPEAMENTO DE PINOS
 #define PIN_UMIDADE_SOLO 34 // pino do sensor de umidade de solo
@@ -13,6 +14,7 @@ DHT dht(PIN_DHT, DHTTYPE); // cria o objeto do DHT11
 BH1750 lightMeter; // cria o objeto medidor pela biblioteca do Christopher Laws
 
 // VARIÁVEIS GLOBAIS DE LEITURA
+String macHardware = ""; // variável para guardar o endereço MAC
 float umidadeSoloBruto = 0.0; // umidade do solo em valor analógico
 float umidadeSoloValor10bits = 0.0; // umidade solo na escala de 10bits
 float umidadeSoloPorcentagem = 0.0; // umidade do solo em porcentagem
@@ -35,21 +37,29 @@ void setup() {
   Serial.println("    \\_____/");
   Serial.println("\n[Lumees Yapplanta] Inicializando o Hardware...");
 
-  // 1. iniciando o barramento I2C (Pinos nativos do ESP32: SDA=21, SCL=22)
+  // 1. CAPTURA DO MAC ADDRESS
+  // ativando o modo Station do WiFi pro chip acordar o rádio e ler o endereço
+  WiFi.mode(WIFI_STA); 
+  macHardware = WiFi.macAddress(); // captura o MAC no formato padrão "AA:BB:CC:DD:EE:FF"
+  
+  Serial.print("MAC Address deste hardware: ");
+  Serial.println(macHardware); // esse é o identificado único
+  
+  // 2. iniciando o barramento I2C (Pinos nativos do ESP32: SDA=21, SCL=22)
   Wire.begin();
 
-  // 2. iniciando o Sensor de Luz BH1750
+  // 3. iniciando o Sensor de Luz BH1750
   if (lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE)) {
     Serial.println("Sensor BH1750 (Luz em Lux) iniciado com sucesso!");
   } else {
     Serial.println("Erro ao iniciar o BH1750! Verifique as conexões SCL/SDA.");
   }
 
-  // 3. iniciando o Sensor de Clima DHT11
+  // 4. iniciando o Sensor de Clima DHT11
   dht.begin();
   Serial.println("Sensor DHT11 (Clima Ar) inicializado!");
 
-  // 4. configura o pino do potenciômetro/solo como entrada
+  // 5. configura o pino do potenciômetro/solo como entrada
   pinMode(PIN_UMIDADE_SOLO, INPUT);
   
   Serial.println("Sistema totalmente iniciado!! Pronto para fazer as coletas...\n");
@@ -89,9 +99,8 @@ void loop() {
 
   // 5. EXIBIÇÃO DOS DADOS FORMATADOS NO MONITOR SERIAL
   Serial.println("=====================================");
-  //Serial.print("* Umidade do Solo (Bruta): "); Serial.print(umidadeSoloBruto);
-  //Serial.print(" | Porcentagem: "); Serial.print(umidadeSoloPorcentagem); Serial.println("%");
-  
+  Serial.print("* ID Dispositivo (MAC): "); Serial.println(macHardware);
+
   Serial.print("* Umidade do Solo (0-4095): "); Serial.println(umidadeSoloBruto);
   Serial.print("* Umidade do Solo (0-1023): "); Serial.println(umidadeSoloValor10bits); 
   Serial.print("* Umidade do Solo (%): "); Serial.print(umidadeSoloPorcentagem); Serial.println("%");
