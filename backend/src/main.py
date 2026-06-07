@@ -1,12 +1,13 @@
 from fastapi import FastAPI
-from routers import ia, hardware
+from routers import ia, hardware, report
 from fastapi.testclient import TestClient
 
 app = FastAPI(title="Lumees Yapp API")
 
 # modularidade:
-app.include_router(ia.router, prefix="/lumees-api/v1", tags=["Inteligência Artificial"])
-app.include_router(hardware.router, prefix="/lumees-api/v1", tags=["Hardware"])
+app.include_router(ia.router, prefix="/lumees-api/v1", tags=["Inteligência Artificial"]) # rota da análise de IA
+app.include_router(hardware.router, prefix="/lumees-api/v1", tags=["Hardware"]) # rota da comunicação com hardware
+app.include_router(report.router, prefix="/lumees-api/v1", tags=["Relatório CSV"]) # rota para exportar relatório CSV
 
 @app.get("/")
 async def root():
@@ -49,3 +50,10 @@ if __name__ == "__main__":
     print(f"Status HTTP: {resposta_esp.status_code}")
     print("JSON:", resposta_esp.json())
     print("----------------------------\n")
+
+    id_planta_teste = "planta_cebolinha_01"
+    resposta_report = cliente.get(f"/lumees-api/v1/plantas/{id_planta_teste}/exportar-csv")
+    print("\n--- [TESTE REPORT CSV] RESULTADO ---")
+    print(f"Status HTTP: {resposta_report.status_code}")
+    print(f"JSON: {resposta_report.json()}")
+    print("------------------------------------\n")
