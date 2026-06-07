@@ -1,0 +1,10 @@
+# ignorar arquivos de credenciais
+*.json
+.env
+.env.local
+
+# ignorar pastas de ambiente virtual e build
+venv/
+__pycache__/
+.dart_tool/
+build/
