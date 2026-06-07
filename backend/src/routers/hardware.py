@@ -1,6 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter
 from pydantic import BaseModel
+from typing import Optional
 
 router = APIRouter()
 
@@ -11,8 +12,10 @@ class ColetaHardware(BaseModel):
     luminosidade: float
     temperatura_ar: float
     umidade_ar: float
-    estacao_ano: str
-    periodo_dia: str
+    
+    # Marcando como opcionais para o ESP32 não ser obrigado a enviar!
+    estacao_ano: Optional[str] = None  
+    periodo_dia: Optional[str] = None
 
 @router.post("/hardware/coleta")
 def receber_dados_hardware(dados: ColetaHardware):
