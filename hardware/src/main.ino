@@ -55,5 +55,44 @@ void setup() {
 }
 
 void loop() {
-  //
+  // 1. LEITURA DO SENSOR DE UMIDADE DE SOLO
+  // no ESP32, o analogRead vai de 0 a 4095 (12 bits)
+  umidadeSoloBruto = analogRead(PIN_UMIDADE_SOLO);
+  
+  //// MAPEAMENTO E INVERSÃO DA LÓGICA:
+  // solo seco na água cospem valores altos (~4095)
+  // solo encharcado cospe valor baixo (~0)
+  // mapeando: 4095 vira 0% (seco) e 0 vira 100% (molhado)
+  umidadeSoloPorcentagem = map(umidadeSoloBruto, 4095, 0, 0, 100);
+  
+  // garante que o valor fique travado entre 0% e 100% para não dar bugs visuais
+  umidadeSoloPorcentagem = constrain(umidadeSoloPorcentagem, 0, 100);
+
+  // 2. LEITURA DO DHT11 (TEMPERATURA E UMIDADE DO AR)
+  temperaturaAr = dht.readTemperature();
+  umidadeAr = dht.readHumidity();
+
+  // 3. LEITURA DO BH1750 (LUMINOSIDADE EM LUX)
+  luxLuminosidade = lightMeter.readLightLevel();
+
+  // 4. VALIDAÇÃO DE LEITURAS (se o DHT falhar)
+  if (isnan(temperaturaAr) || isnan(umidadeAr)) {
+    Serial.println("Falha ao ler o sensor DHT11! Mantendo valores zerados.");
+    temperaturaAr = 0.0;
+    umidadeAr = 0.0;
+  }
+
+  // 5. EXIBIÇÃO DOS DADOS FORMATADOS NO MONITOR SERIAL
+  Serial.println("=========================================================");
+  Serial.print("* Umidade do Solo (Bruta): "); Serial.print(umidadeSoloBruto);
+  Serial.print(" | Porcentagem: "); Serial.print(umidadeSoloPorcentagem); Serial.println("%");
+  
+  Serial.print("* Temperatura do Ar: "); Serial.print(temperaturaAr); Serial.println("°C");
+  Serial.print("* Umidade do Ar: "); Serial.print(umidadeAr); Serial.println("%");
+  
+  Serial.print("* Luminosidade: "); Serial.print(luxLuminosidade); Serial.println(" lx");
+  Serial.println("=========================================================\n");
+
+  // o DHT11 precisa de pelo menos 2 segundos entre as leituras para não travar
+  delay(2000); 
 }
