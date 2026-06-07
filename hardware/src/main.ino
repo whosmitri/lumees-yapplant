@@ -14,6 +14,7 @@ BH1750 lightMeter; // cria o objeto medidor pela biblioteca do Christopher Laws
 
 // VARIÁVEIS GLOBAIS DE LEITURA
 float umidadeSoloBruto = 0.0; // umidade do solo em valor analógico
+float umidadeSoloValor10bits = 0.0; // umidade solo na escala de 10bits
 float umidadeSoloPorcentagem = 0.0; // umidade do solo em porcentagem
 float luxLuminosidade = 0.0; // luminosidade em lux
 float temperaturaAr = 0.0; // temperatura do ar
@@ -38,7 +39,7 @@ void setup() {
   Wire.begin();
 
   // 2. iniciando o Sensor de Luz BH1750
-  if (lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {
+  if (lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE)) {
     Serial.println("Sensor BH1750 (Luz em Lux) iniciado com sucesso!");
   } else {
     Serial.println("Erro ao iniciar o BH1750! Verifique as conexões SCL/SDA.");
@@ -58,6 +59,10 @@ void loop() {
   // 1. LEITURA DO SENSOR DE UMIDADE DE SOLO
   // no ESP32, o analogRead vai de 0 a 4095 (12 bits)
   umidadeSoloBruto = analogRead(PIN_UMIDADE_SOLO);
+
+  //// TRANSFORMA O VALOR LIDO PRA ESCALA DE 10bits
+  umidadeSoloValor10bits = map(umidadeSoloBruto, 0, 4095, 0, 1023);
+  umidadeSoloValor10bits = constrain(umidadeSoloValor10bits, 0, 1023); // trava de segurança para não ser menor que 0 e não ultrapassar 1023
   
   //// MAPEAMENTO E INVERSÃO DA LÓGICA:
   // solo seco na água cospem valores altos (~4095)
@@ -83,15 +88,19 @@ void loop() {
   }
 
   // 5. EXIBIÇÃO DOS DADOS FORMATADOS NO MONITOR SERIAL
-  Serial.println("=========================================================");
-  Serial.print("* Umidade do Solo (Bruta): "); Serial.print(umidadeSoloBruto);
-  Serial.print(" | Porcentagem: "); Serial.print(umidadeSoloPorcentagem); Serial.println("%");
+  Serial.println("=====================================");
+  //Serial.print("* Umidade do Solo (Bruta): "); Serial.print(umidadeSoloBruto);
+  //Serial.print(" | Porcentagem: "); Serial.print(umidadeSoloPorcentagem); Serial.println("%");
   
+  Serial.print("* Umidade do Solo (0-4095): "); Serial.println(umidadeSoloBruto);
+  Serial.print("* Umidade do Solo (0-1023): "); Serial.println(umidadeSoloValor10bits); 
+  Serial.print("* Umidade do Solo (%): "); Serial.print(umidadeSoloPorcentagem); Serial.println("%");
+
   Serial.print("* Temperatura do Ar: "); Serial.print(temperaturaAr); Serial.println("°C");
   Serial.print("* Umidade do Ar: "); Serial.print(umidadeAr); Serial.println("%");
   
   Serial.print("* Luminosidade: "); Serial.print(luxLuminosidade); Serial.println(" lx");
-  Serial.println("=========================================================\n");
+  Serial.println("=====================================\n");
 
   // o DHT11 precisa de pelo menos 2 segundos entre as leituras para não travar
   delay(2000); 
