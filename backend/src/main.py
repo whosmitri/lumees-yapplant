@@ -1,8 +1,28 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
+import firebase_admin
+from firebase_admin import credentials
 from routers import ia, hardware, report
 from fastapi.testclient import TestClient
 
-app = FastAPI(title="Lumees Yapp API")
+# configurando o ciclo de vida (Lifespan) para iniciar o firebase
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # executa QUANDO A API INICIA
+    try:
+        # caminho para o arquivo de credenciais do firebase
+        cred = credentials.Certificate("firebase-credentials.json")
+        firebase_admin.initialize_app(cred)
+        print("Firebase inicializado com sucesso!")
+    except Exception as e:
+        print(format(f"Erro ao inicializar o Firebase: {e}"))
+    
+    yield  # Aqui a API fica rodando normalmente
+    
+    # apenas notificando o encerramento
+    print("Encerrando aplicação...")
+
+app = FastAPI(title="Lumees Yapp API", lifespan=lifespan)
 
 # modularidade:
 app.include_router(ia.router, prefix="/lumees-api/v1", tags=["Inteligência Artificial"]) # rota da análise de IA
@@ -15,7 +35,7 @@ async def root():
 
 
 if __name__ == "__main__":
-    print("\n🧪 Executando testes locais de integração dos módulos...")
+    print("\nExecutando testes locais de integração dos módulos...")
     cliente = TestClient(app)
     
     dados_teste_ia = {
@@ -57,3 +77,7 @@ if __name__ == "__main__":
     print(f"Status HTTP: {resposta_report.status_code}")
     print(f"JSON: {resposta_report.json()}")
     print("------------------------------------\n")
+
+    # o "TestClient" também dispara os eventos de lifespan, então o Firebase tentará inicializar aqui no teste local mesmo
+    resposta = cliente.get("/")
+    print(f"Status do teste básico: {resposta.status_code} - {resposta.json()}")
