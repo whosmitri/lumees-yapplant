@@ -4,17 +4,16 @@ import pickle
 from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from firebase_admin import firestore
+from datetime import datetime, timedelta, time, timezone
 
 router = APIRouter()
 
 # definimos o contrato de entrada. o flutter DEVE mandar esses 3 dados:
 class RequisicaoAnalise(BaseModel):
-    uid: str # ID do usuário dono da planta (Firebase Auth)
-    id_planta: str # ID específico daquela plantinha no banco
-    id_especie: str # Ex: "Suculenta", "Salsinha", "Cebolinha", "Lírio da Paz"
-    umidade_solo_bruto: float # dado instantâneo do sensor
-    umidade_ha_7_dias: float # média histórica do Firebase
-    estacao_ano: str # "Verão", "Inverno", "Primavera", "Outono"
+    id_planta: str    # ID específico daquela plantinha no banco
+    id_especie: str   # Ex: "suculenta", "cebolinha"
+    estacao_ano: str  # "Verão", "Inverno", "Primavera", "Outono"
 
 
 # pega o caminho absoluto de onde o arquivo ia.py está rodando
@@ -63,7 +62,33 @@ for especie in ESPECIES:
     else:
         print(f"Erro ao carregar arquivos para a espécie: {especie}")
 
-# RODA DA ANÁLISE IA
+
+# função que pega o último valor bruto da umidade do solo lido/enviado há 7 dias
+def buscar_umidade_7_dias(db, id_planta: str, umidade_atual_fallback: float) -> float:
+    
+    # busca a última leitura de umidade bruta de 7 dias atrás, se não encontrar, usa a umidade atual como fallback para não quebrar a IA
+    agora = datetime.now(timezone.utc)
+    sete_dias_atras = agora - timedelta(days=7)
+    fim_do_dia_alvo = datetime.combine(sete_dias_atras.date(), time(23, 59, 59), tzinfo=timezone.utc)
+    
+    # faz a query exatamente na subcoleção 'historico_leituras' daquela planta
+    query = (db.collection("plantas").document(id_planta)
+             .collection("historico_leituras")
+             .where("timestamp", "<=", fim_do_dia_alvo)
+             .order_by("timestamp", direction=firestore.Query.DESCENDING)
+             .limit(1))
+    
+    resultados = list(query.stream())
+    
+    if resultados:
+        # pega a primeira linha de tudo enviado pelo firebase (a última leitura feita naquele dia)
+        dados_leitura = resultados[0].to_dict()
+        return dados_leitura.get("umidade_solo_bruto", umidade_atual_fallback)
+    
+    return umidade_atual_fallback
+
+
+# ROTA DA ANÁLISE IA
 @router.post("/ia/analise")
 def analisar_planta(dados: RequisicaoAnalise):
     especie = dados.id_especie.lower()
@@ -74,7 +99,36 @@ def analisar_planta(dados: RequisicaoAnalise):
             status_code=400, 
             detail=f"A espécie '{dados.id_especie}' não é suportada ou o modelo não foi carregado."
         )
+
     
+    # 2. conexão com o firebase
+    try:
+        db = firestore.client()  # puxa o cliente conectado lá no main.py
+        
+        # buscando o documento da planta específica
+        ref_doc_planta = db.collection("plantas").document(dados.id_planta)
+        doc_planta = ref_doc_planta.get()
+        
+        # em caso de falha:
+        if not doc_planta.exists:
+            raise HTTPException(status_code=404, detail="Planta não encontrada no Firebase.")
+        
+        # transforma a resposta do firebase em dicionário python
+        dados_firebase = doc_planta.to_dict()
+
+        # pegando a umidade do solo atual
+        ultima_leitura = dados_firebase.get("ultima_leitura", {})
+        umidade_solo_bruto = ultima_leitura.get("umidade_solo_bruto")
+        
+        # busca a leitura de 7 dias atrás
+        umidade_ha_7_dias = buscar_umidade_7_dias(db, dados.id_planta, umidade_solo_bruto)
+        
+    except Exception as e:
+        if isinstance(e, HTTPException): raise e
+        raise HTTPException(status_code=500, detail=f"Erro ao conectar ao Firebase: {e}")
+
+    
+    # 3. execução do modelo ia
     # recupera o modelo e o scaler corretos dos dicionários
     modelo_knn = modelos_carregados[especie]
     scaler = scalers_carregados[especie]
@@ -85,7 +139,7 @@ def analisar_planta(dados: RequisicaoAnalise):
     
     # monta a matriz de features exatamente na ordem que o modelo foi treinado
     # ordem do treino: umidade_solo_atual, umidade_solo_ha_7_dias, estacao_inteiro
-    dados_brutos = [[dados.umidade_solo_bruto, dados.umidade_ha_7_dias, estacao_inteiro]]
+    dados_brutos = [[umidade_solo_bruto, umidade_ha_7_dias, estacao_inteiro]]
     
     # normaliza os dados reais usando a mesma régua do treinamento!
     dados_normalizados = scaler.transform(dados_brutos)
@@ -99,30 +153,40 @@ def analisar_planta(dados: RequisicaoAnalise):
     texto_explicativo = ""
     
     if status_bruto == "Excelente":
-        status_interface = "Excelente"
         texto_explicativo = "Análise concluída! Sua plantinha está em excelentes condições. Os sensores indicam um ambiente saudável e favorável ao crescimento. Continue com esse cuidado incrível!"
         
     elif status_bruto == "Bom":
-        status_interface = "Bom"
         texto_explicativo = "Tudo dentro dos parâmetros esperados. Sua planta está saudável e os cuidados atuais estão funcionando bem!"
         
     elif status_bruto == "Razoável":
-        status_interface = "Razoável"
         texto_explicativo = "Detectei algumas mudanças nas condições da planta. Ela ainda está estável, mas merece um pouco mais de atenção. Recomendo acompanhar os próximos relatórios e realizar pequenos ajustes se necessário"
         
     elif status_bruto == "Ruim":
-        status_interface = "Ruim"
         texto_explicativo = "Alerta de saúde!!! As condições atuais não estão favorecendo o desenvolvimento da planta. Recomendo revisar os cuidados."
         
     elif status_bruto == "Crítico":
-        status_interface = "Crítico"
         texto_explicativo = "Alerta crítico!!!! A saúde da planta está comprometida e requer atenção imediata. Quanto mais rápido você agir, maiores serão as chances de recuperação."
 
-    # Retorno estruturado pronto para mandar para o Firebase
-    return {
-        "uid": dados.uid,
+    # retorno estruturado pronto para mandar para o Firebase
+    resultado_final = {
         "id_planta": dados.id_planta,
-        "estado_classificado": status_interface,
-        "texto_explicativo": texto_explicativo,
-        "timestamp": datetime.now()
+        "timestamp": datetime.now(timezone.utc),
+        "estado_classificado": status_bruto,
+        "texto_explicativo": texto_explicativo
     }
+
+    try:
+        # salva no histórico de análises da planta
+        ref_doc_planta.collection("analises_ia").add(resultado_final)
+        
+        # atualiza o status em tempo real na raiz do doc da planta
+        ref_doc_planta.update({
+            "ultimo_status_ia": status_bruto,
+            "texto_explicativo_ia": texto_explicativo,
+            "ultima_analise_ia": datetime.now(timezone.utc)
+        })
+
+    except Exception as e:
+        print(f"AVISO: Modelo analisou, mas falhou ao atualizar o doc da planta: {e}")
+
+    return resultado_final
