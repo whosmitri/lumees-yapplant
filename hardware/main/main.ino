@@ -43,15 +43,7 @@ void setup() {
   Serial.println("    \\_____/");
   Serial.println("\n[Lumees Yapplanta] Inicializando o Hardware...");
 
-  // 1. CAPTURA DO MAC ADDRESS
-  // ativando o modo Station do WiFi pro chip acordar o rádio e ler o endereço
-  WiFi.mode(WIFI_STA); 
-  macHardware = WiFi.macAddress(); // captura o MAC no formato padrão "AA:BB:CC:DD:EE:FF"
-  
-  Serial.print("MAC Address deste hardware: ");
-  Serial.println(macHardware); // esse é o identificado único
-  
-  // 2. WIFIMANAGER (conexão externa)
+  // 1. WIFIMANAGER (conexão externa)
   WiFiManager wifiMan;
 
   // se o ESP32 não tiver rede salva, ele cria o ponto de acesso "Lumees_Yapp_Setup"
@@ -62,6 +54,14 @@ void setup() {
       ESP.restart();
   } 
   Serial.println("WiFi Conectado com sucesso!!");
+
+  // 2. CAPTURA DO MAC ADDRESS
+  // ativando o modo Station do WiFi pro chip acordar o rádio e ler o endereço
+  WiFi.mode(WIFI_STA); 
+  macHardware = WiFi.macAddress(); // captura o MAC no formato padrão "AA:BB:CC:DD:EE:FF"
+  
+  Serial.print("MAC Address deste hardware: ");
+  Serial.println(macHardware); // esse é o identificado único
 
   // 3. iniciando o barramento I2C (Pinos nativos do ESP32: SDA=21, SCL=22)
   Wire.begin();
@@ -173,6 +173,6 @@ void loop() {
     Serial.println("Wi-Fi desconectado! Tentando reconectar automaticamente...");
   }
 
-  // o DHT11 precisa de pelo menos 2 segundos entre as leituras para não travar
-  delay(2000); 
+  // 10 minutos de delay até a próxima leitura
+  delay(600000); 
 }
