@@ -86,7 +86,7 @@ def exportar_historico_csv(id_planta: str):
         blob.upload_from_string(conteudo_csv, content_type="text/csv")
         
         # 4. GERA URL DE DOWNLOAD VÁLIDA
-        url_download_real = blob.generate_signed_url(
+        url_download = blob.generate_signed_url(
             version="v4",
             expiration=timedelta(hours=1), # expira em 1 hora para segurança dos dados
             method="GET" # flutter apenas pega o arquivo
@@ -99,6 +99,6 @@ def exportar_historico_csv(id_planta: str):
     return {
         "status": "Sucesso",
         "id_planta": id_planta,
-        "url_download": url_storage_simulada,
+        "url_download": url_download,
         "mensagem": "Relatório CSV processado com sucesso. Link pronto para download."
     }
