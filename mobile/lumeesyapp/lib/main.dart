@@ -20,8 +20,6 @@ class LumeesApp extends StatelessWidget {
       home: const TelaHome(),
 
       routes: {
-        '/': (context) => const TelaHome(),
-
         // adicionar depois
         // '/autenticacao': (context) => const TelaAutenticacao(),
         // '/dashboard': (context) => const TelaDashboard(),

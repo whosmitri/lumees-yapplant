@@ -241,7 +241,7 @@ class _TelaRelatorioState extends State<TelaRelatorio> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppTheme.auxDanger.withOpacity(0.1),
+                      color: AppTheme.auxDanger.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
