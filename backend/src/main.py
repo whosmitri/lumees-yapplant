@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import firebase_admin
@@ -11,7 +12,10 @@ async def lifespan(app: FastAPI):
     # executa QUANDO A API INICIA
     try:
         # caminho para o arquivo de credenciais do firebase
-        cred = credentials.Certificate("firebase-credentials.json")
+        CAMINHO_MAIN = os.path.dirname(os.path.abspath(__file__))
+        CAMINHO_JSON = os.path.join(CAMINHO_MAIN, "firebase-credentials.json")
+
+        cred = credentials.Certificate(CAMINHO_JSON)
         firebase_admin.initialize_app(cred)
         print("Firebase inicializado com sucesso!")
     except Exception as e:
@@ -33,51 +37,71 @@ app.include_router(report.router, prefix="/lumees-api/v1", tags=["Relatório CSV
 async def root():
     return {"message": "Bem-vindo ao Backend do Lumees Yapp!"}
 
-
+"""
 if __name__ == "__main__":
     print("\nExecutando testes locais de integração dos módulos...")
     cliente = TestClient(app)
-    
-    dados_teste_ia = {
-        "uid": "user_senai_2026",
-        "id_planta": "planta_cebolinha_01",
-        "id_especie": "cebolinha",
-        "umidade_solo_bruto": 850.0,
-        "umidade_ha_7_dias": 500.0,
-        "estacao_ano": "Inverno"
-    }
 
-    dados_teste_hardware = {
-        "mac_hardware": "24:0A:C4:B3:11:42",
-        "umidade_solo_bruto": "850.0",
-        "umidade_solo_porcentagem": "83",
-        "luminosidade": "2000",
-        "temperatura_ar": "23",
-        "umidade_ar": "45",
-        "estacao_ano": "verão",
-        "periodo_dia": "dia"
+    with cliente:
+        
+        # Teste Raiz
+        resposta = cliente.get("/")
+        print(f"Status do teste básico: {resposta.status_code} - {resposta.json()}")
+        
+        # Dados de Teste IA
+        dados_teste_ia = {
+            "id_planta": "planta_cebolinha_01",
+            "id_especie": "cebolinha",
+            "estacao_ano": "Inverno"
+        }
 
-    }
-    
-    resposta_ia = cliente.post("/lumees-api/v1/ia/analise", json=dados_teste_ia)
-    print("\n--- [TESTE IA] RESULTADO ---")
-    print(f"Status HTTP: {resposta_ia.status_code}")
-    print("JSON:", resposta_ia.json())
-    print("----------------------------\n")
+        print("\n--- [TESTE IA] RESULTADO ---")
+        resposta_ia = cliente.post(
+            "/lumees-api/v1/ia/analise",
+            json=dados_teste_ia
+        )
+        print(f"Status HTTP: {resposta_ia.status_code}")
+        try:
+            print("JSON:", resposta_ia.json())
+        except:
+            print("Resposta:", resposta_ia.text)
+        print("----------------------------\n")
 
-    resposta_esp = cliente.post("/lumees-api/v1/hardware/coleta", json=dados_teste_hardware)
-    print("\n--- [TESTE HARDWARE] RESULTADO ---")
-    print(f"Status HTTP: {resposta_esp.status_code}")
-    print("JSON:", resposta_esp.json())
-    print("----------------------------\n")
+        # Dados de Teste Hardware
+        dados_teste_hardware = {
+            "mac_hardware": "24:0A:C4:B3:11:42",
+            "umidade_solo_bruto": 850.0,
+            "umidade_solo_porcentagem": 83.0,
+            "luminosidade": 2000.0,
+            "temperatura_ar": 23.0,
+            "umidade_ar": 45.0,
+            "estacao_ano": "verão",
+            "periodo_dia": "dia"
+        }
 
-    id_planta_teste = "planta_cebolinha_01"
-    resposta_report = cliente.get(f"/lumees-api/v1/plantas/{id_planta_teste}/exportar-csv")
-    print("\n--- [TESTE REPORT CSV] RESULTADO ---")
-    print(f"Status HTTP: {resposta_report.status_code}")
-    print(f"JSON: {resposta_report.json()}")
-    print("------------------------------------\n")
+        print("\n--- [TESTE HARDWARE] RESULTADO ---")
+        resposta_hardware = cliente.post(
+            "/lumees-api/v1/hardware/coleta",
+            json=dados_teste_hardware
+        )
+        print(f"Status HTTP: {resposta_hardware.status_code}")
+        try:
+            print("JSON:", resposta_hardware.json())
+        except:
+            print("Resposta:", resposta_hardware.text)
+        print("---------------------------------\n")
 
-    # o "TestClient" também dispara os eventos de lifespan, então o Firebase tentará inicializar aqui no teste local mesmo
-    resposta = cliente.get("/")
-    print(f"Status do teste básico: {resposta.status_code} - {resposta.json()}")
+        # Dados de Teste Report CSV
+        id_planta_teste = "planta_cebolinha_01"
+
+        print("\n--- [TESTE REPORT CSV] RESULTADO ---")
+        resposta_report = cliente.get(
+            f"/lumees-api/v1/plantas/{id_planta_teste}/exportar-csv"
+        )
+        print(f"Status HTTP: {resposta_report.status_code}")
+        try:
+            print("JSON:", resposta_report.json())
+        except:
+            print("Resposta:", resposta_report.text)
+        print("------------------------------------\n")
+"""
