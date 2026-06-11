@@ -30,10 +30,10 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
       carregando = false;
       possuiResultado = true;
 
-      estadoClassificado = "razoável";
+      estadoClassificado = "Excelente";
 
       textoExplicativo =
-          "Sua planta apresentou uma boa estabilidade da umidade do solo durante os últimos sete dias. O modelo KNN identificou que os valores permanecem dentro da faixa considerada saudável. Continue mantendo os cuidados atuais.";
+          "Análise concluída! Sua plantinha está em excelentes condições. Os sensores indicam um ambiente saudável e favorável ao crescimento. Continue com esse cuidado incrível!";
     });
     // =================
   }
@@ -92,159 +92,167 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
       ),
 
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 650,
+            ),
+      
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
 
-              // TOPO
-              Image.asset(
-                "assets/images/bgs/lee.png",
-                height: 170,
-              ),
+                  // TOPO
+                  Image.asset(
+                    "assets/images/bgs/lee.png",
+                    height: 170,
+                  ),
 
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              const Text(
-                "Lee",
-                style: AppTheme.titleLarge,
-              ),
+                  const Text(
+                    "Lee",
+                    style: AppTheme.titleLarge,
+                  ),
 
-              const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-              const Text(
-                "Assistente Inteligente do Lumees",
-                style: AppTheme.bodyMedium,
-              ),
+                  const Text(
+                    "Assistente Inteligente do Lumees",
+                    style: AppTheme.bodyMedium,
+                  ),
 
-              const SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.psychology),
-                  label: const Text("Analisar Planta"),
-                  onPressed: carregando ? null : analisarPlanta,
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              if (carregando)
-                Column(
-                  children: const [
-
-                    CircularProgressIndicator(),
-
-                    SizedBox(height: 18),
-
-                    Text(
-                      "Lee está analisando sua planta...",
-                      style: AppTheme.bodyMedium,
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.psychology),
+                      label: const Text("Analisar Planta"),
+                      onPressed: carregando ? null : analisarPlanta,
                     ),
-                  ],
-                ),
-
-              if (possuiResultado) ...[
-
-                // CARD DIAGNÓSTICO
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-
-                  decoration: BoxDecoration(
-                    color: AppTheme.auxSand,
-                    borderRadius: BorderRadius.circular(20),
                   ),
 
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+                  const SizedBox(height: 24),
 
-                      Icon(
-                        getIconeDiagnostico(),
-                        size: 70,
-                        color: getCorDiagnostico(),
-                      ),
+                  if (carregando)
+                    Column(
+                      children: const [
 
-                      const SizedBox(width: 20),
+                        CircularProgressIndicator(),
 
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
+                        SizedBox(height: 18),
 
-                            const Text(
-                              "Diagnóstico",
-                              style: AppTheme.titleMedium,
-                            ),
-
-                            const SizedBox(height: 6),
-
-                            Text(
-                              estadoClassificado,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.auxOlive,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          "Lee está analisando sua planta...",
+                          style: AppTheme.bodyMedium,
                         ),
+                      ],
+                    ),
+
+                  if (possuiResultado) ...[
+
+                    // CARD DIAGNÓSTICO
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+
+                      decoration: BoxDecoration(
+                        color: AppTheme.auxSand,
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    ],
-                  ),
-                ),
 
-                const SizedBox(height: 20),
-
-                // CARD EXPLICAÇÃO
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-
-                  decoration: BoxDecoration(
-                    color: AppTheme.auxSand,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-
-                      Row(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
 
-                          const Icon(
-                            Icons.description_outlined,
-                            color: AppTheme.auxOlive,
+                          Icon(
+                            getIconeDiagnostico(),
+                            size: 70,
+                            color: getCorDiagnostico(),
                           ),
 
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 20),
 
-                          Text(
-                            "Explicação do Lee",
-                            style: AppTheme.titleSmall.copyWith(
-                              color: AppTheme.auxOlive,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+
+                                const Text(
+                                  "Diagnóstico",
+                                  style: AppTheme.titleMedium,
+                                ),
+
+                                const SizedBox(height: 6),
+
+                                Text(
+                                  estadoClassificado,
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.auxOlive,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
+                    ),
 
-                      const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
-                      Text(
-                        textoExplicativo,
-                        style: AppTheme.bodyMedium,
-                        textAlign: TextAlign.justify,
+                    // CARD EXPLICAÇÃO
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+
+                      decoration: BoxDecoration(
+                        color: AppTheme.auxSand,
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
+
+                      child: Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                        children: [
+
+                          Row(
+                            children: [
+
+                              const Icon(
+                                Icons.description_outlined,
+                                color: AppTheme.auxOlive,
+                              ),
+
+                              const SizedBox(width: 10),
+
+                              Text(
+                                "Explicação do Lee",
+                                style: AppTheme.titleSmall.copyWith(
+                                  color: AppTheme.auxOlive,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          Text(
+                            textoExplicativo,
+                            style: AppTheme.bodyMedium,
+                            textAlign: TextAlign.justify,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
