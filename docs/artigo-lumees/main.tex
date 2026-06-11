@@ -36,6 +36,10 @@
 \usepackage{graphicx}
 % para melhorias de justificação:
 \usepackage{microtype}
+% para ibliografia:
+\usepackage{url}
+% para adicionar imagem:
+\usepackage{graphicx}
 % ---
 
 % -- Pacotes de citações --
@@ -126,15 +130,14 @@
 %%
 % ferramenta do pacote abnTeX para fazer resumo em português (também escreve automaticamente a palavra "Resumo" centralizada e em negrito no topo)
 \begin{resumoumacoluna}
- Aqui vai o resumo !!
-
+Este trabalho apresenta o desenvolvimento do Lumees Yapplant, um ecossistema inteligente baseado em Internet das Coisas (IoT), computação em nuvem e inteligência artificial dedicado ao monitoramento residencial e classificação preditiva da saúde de plantas. O sistema aborda a dificuldade na manutenção botânica doméstica decorrente da invisibilidade de variáveis microclimáticas e edáficas. Para a captura de dados, implementou-se um módulo de hardware sob o microcontrolador ESP32 integrado a sensores de temperatura, umidade do ar (DHT11), luminosidade (BH1750) e umidade de solo (higrômetro analógico). Os dados de telemetria são normalizados e transmitidos via requisições HTTP POST para uma API assíncrona desenvolvida em FastAPI. O backend consome um modelo de aprendizado supervisionado baseado no algoritmo K-Nearest Neighbors (KNN), treinado com dados sintéticos estruturados e exportado em formato binário (.pkl), para classificar o estado de saúde vegetal e vincular diagnósticos explicativos automatizados. A persistência dos históricos e estados correntes ocorre em uma base NoSQL do Firebase Firestore. Uma aplicação móvel desenvolvida em Flutter permite a visualização gráfica temporal das últimas 5 horas, exportação de relatórios em formato CSV e a renderização dinâmica de um avatar gamificado responsivo ao diagnóstico da inteligência artificial. O sistema demonstrou alta acurácia na classificação analítica e viabilidade técnica para a sincronização síncrona de dados entre hardware e interfaces móveis.
+ 
  % separa o texto do resumo da linha de palavras-chave:
  \vspace{\onelineskip}
  
  % No Indentation (Sem Recuo):
  \noindent
- 
- \textbf{Palavras-chaves}: latex. abntex. editoração de texto.
+ \textbf{Palavras-chaves}: Internet das Coisas (IoT). Aprendizado de Máquina. FastAPI. Flutter. Monitoramento Ambiental.
 \end{resumoumacoluna}
 % ---
 
@@ -226,32 +229,114 @@ O sistema é estruturado em quatro camadas principais que trabalham de forma int
 
 % -- Banco de Dados
 \subsection{Diagrama de Dados}
-Imagem do nosso diagrama
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{lumees-yapp_modelagem-dados.jpg}
+    \caption{Tabelas de dados.}
+    \label{fig:lumees-yapp_modelagem-dados}
+\end{figure}
 % --
+
+\newpage
 
 % -- Fluxo de Dados
 \subsection{Fluxo de Dados}
-Imagem do fluxograma
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{lumees-yapp_ fluxo-geral.jpg}
+    \caption{Fluxo de dados geral.}
+    \label{fig:lumees-yapp_fluxo-geral}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{lumees-yapp_fluxo-específico.jpg}
+    \caption{Fluxo de dados específico.}
+    \label{fig:lumees-yapp_fluxo-específico}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{lumees-yapp_fluxo-auth.jpg}
+    \caption{Fluxo de dados da autenticação.}
+    \label{fig:lumees-yapp_fluxo-auth}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{lumees-yapp_fluxo-app.jpg}
+    \caption{Fluxo de dados da aplicação.}
+    \label{fig:lumees-yapp_fluxo-app}
+\end{figure}
 % --
 % ---
 
+\newpage
+
 % --- HARDWARE
 \section{Desenvolvimento do Hardware e IoT}
-Texto
+O núcleo do hardware é constituído pelo microcontrolador ESP32, selecionado devido à sua capacidade de processamento, baixo consumo de energia e conectividade Wi-Fi nativa. Este dispositivo faz a interface com três sensores principais: um sensor de umidade de solo (analógico), um sensor DHT11 para temperatura e umidade do ar, e um sensor BH1750 para medição de luminosidade via protocolo I2C. A recolha e envio de dados ocorrem a cada 10 minutos, otimizando o consumo de banda e a persistência na infraestrutura de backend.
 
 % -- Componentes Utilizados
 \subsection{Componentes Utilizados}
-Lista
+%
+\begin{table}[htbp]
+\centering
+\caption{Mapeamento de pinos e conexões elétricas dos componentes.}
+\label{tab:mapeamento_hardware}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{COMPONENTE} & \textbf{DETALHES} & \textbf{PINO DO COMPONENTE} & \textbf{PINO NO ESP32} \\ \hline
+Sensor de Umidade de Solo & Leitura analógica da umidade do solo & VCC & 3V3 \\ \hline
+ &  & GND & GND \\ \hline
+ &  & AO (Analog Out) & GPIO 34 \\ \hline
+DHT11 & Temperatura e umidade do ar & VCC & 3V3 \\ \hline
+ &  & GND & GND \\ \hline
+ &  & DATA (Out) & GPIO 15 \\ \hline
+BH1750 & Luminosidade ambiente (Lux) & VCC & 3V3 \\ \hline
+ &  & GND & GND \\ \hline
+ &  & SCL & GPIO 22 \\ \hline
+ &  & SDA & GPIO 21 \\ \hline
+\end{tabular}
+\end{table}
 % --
+
+\newpage
 
 % -- Esquema
 \subsection{Esquema Elétrico e Montagem do Circuito}
-Imagem
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{schematic.png}
+    \caption{Esquema elétrico.}
+    \label{fig:schematic}
+\end{figure}
 % --
 
 % -- Integração
 \subsection{Integração por API}
-Texto
+A integração do sistema ocorre via protocolo HTTP, no qual o ESP32 realiza a coleta, processamento e envio de dados em quatro etapas principais:
+
+\begin{enumerate}
+    \item \textbf{Normalização de dados:} O conversor ADC de 12 bits (0 a 4095) é mapeado para uma escala de 10 bits (0 a 1023), compatível com a camada de inteligência artificial. A umidade do solo também é convertida para uma escala percentual de 0\% (seco) a 100\% (encharcado), utilizando interpolação matemática com limitação por \textit{constrain}.
+
+    \item \textbf{Identificação do dispositivo:} O endereço MAC do ESP32 é utilizado como identificador único do dispositivo e chave de autenticação no sistema.
+
+    \item \textbf{Estruturação dos dados:} As leituras de umidade do solo, luminosidade (lux), temperatura (graus celcius) e umidade do ar (\%) são agrupadas com o MAC em um objeto JSON, posteriormente serializado para envio em rede.
+
+    \item \textbf{Envio dos dados:} O payload JSON é transmitido via requisição \texttt{POST} para o endpoint \texttt{/hardware/coleta} de uma API desenvolvida em FastAPI.
+\end{enumerate}
+
+Na camada de backend, a API valida os dados utilizando \textit{Pydantic} e associa as leituras ao dispositivo correspondente na coleção \texttt{plantas} do Firebase Firestore, utilizando o MAC como chave de busca.
+
+Após a validação, são realizadas duas operações principais no banco de dados:
+
+\begin{itemize}
+    \item Registro da leitura completa com timestamp (UTC) em uma subcoleção histórica do dispositivo;
+    \item Atualização do documento principal com a última leitura recebida.
+\end{itemize}
+
+Essa atualização garante a sincronização em tempo real da interface do usuário desenvolvida em \textit{Flutter}.
 % --
 % ---
 
@@ -322,14 +407,50 @@ A execução da Inteligência Artificial dentro do ecossistema do projeto segue 
 
 % -- Estruturação com FastAPI
 \subsection{Estruturação com FastAPI}
+O microsserviço de backend do projeto \textit{Lumees Yapplant} foi desenvolvido utilizando o \textit{framework} assíncrono \textbf{FastAPI}, escolhido por sua alta performance, validação nativa de dados baseada em tipos complexos e geração automática de documentação. A arquitetura foi desenhada seguindo o princípio da modularidade, segregando as responsabilidades de negócio em roteadores específicos (\textit{Routers}) para garantir a escalabilidade e a manutenibilidade do código-fonte.
 % --
 
 % -- Endpoints
 \subsection{Documentação dos Endpoints (Rotas da API)}
+A comunicação com o backend é estruturada sob o prefixo de versão \texttt{/lumees-api/v1}. A validação de contratos e a tipagem de entrada dos dados de requisições utilizam classes de dados estruturadas através da biblioteca \textbf{Pydantic}.
+
+As rotas disponíveis na aplicação são:
+
+\begin{itemize}
+    \item \texttt{POST /lumees-api/v1/ia/analise}: Recebe o ID da planta, a espécie e a estação do ano atuais. Processa os dados no modelo de inteligência artificial correspondente e retorna a classificação de saúde da planta.
+    %
+    \item \texttt{POST /lumees-api/v1/hardware/coleta}: Ponto de entrada para o dispositivo ESP32. Recebe o endereço MAC do hardware e as leituras dos sensores (umidade do solo, luminosidade, temperatura e umidade do ar).
+    %
+    \item \texttt{GET /lumees-api/v1/plantas/\{id\_planta\}/exportar-csv}: Recebe o identificador de uma planta na URL para gerar o histórico de leituras em formato de planilha.
+\end{itemize}
 % --
 
 % -- Integração Backend-Firebase
 \subsection{Integração Backend-Firebase}
+O backend integra-se com os serviços do Firebase por meio do SDK oficial (\textit{firebase\_admin}), operando em duas frentes: banco de dados NoSQL (\textit{Cloud Firestore}) e armazenamento de arquivos (\textit{Cloud Storage}).
+
+No \textbf{Cloud Firestore}, as operações realizam o gerenciamento dos dados do aplicativo:
+
+\begin{itemize}
+    \item \textbf{Vínculo de Hardware:} A rota de coleta busca no banco qual planta possui o \texttt{mac\_hardware} enviado pelo ESP32 para descobrir o \texttt{id\_planta} correto.
+    %
+    \item \textbf{Histórico de Sensores:} Cada nova leitura do hardware é salva na subcoleção \texttt{historico\_leituras} com um \texttt{timestamp} em formato UTC. O campo \texttt{ultima\_leitura} na raiz do documento também é atualizado para atualizar a interface do usuário.
+    %
+    \item \textbf{Busca Retroativa:} Para executar a IA, o backend faz uma busca no histórico da planta para recuperar o registro de umidade do solo de exatos 7 dias atrás. Se não houver dados, o sistema adota a umidade atual como padrão de segurança.
+    %
+    \item \textbf{Resultados da IA:} O diagnóstico gerado pelo modelo é armazenado no histórico de análises da planta e atualiza o status em tempo real no documento principal.
+\end{itemize}
+
+No \textbf{Cloud Storage}, o backend gerencia o fluxo de geração e exportação de relatórios da seguinte forma:
+\begin{enumerate}
+    \item Busca no Firestore as leituras da planta referentes aos últimos 15 dias corridos.
+    %
+    \item Formata esses dados no padrão CSV (separados por ponto e vírgula) utilizando buffers de texto diretamente na memória RAM (\texttt{io.StringIO}), evitando gravação de arquivos temporários no servidor.
+    %
+    \item Envia o arquivo de texto gerado para uma pasta no Cloud Storage sob o caminho \texttt{relatorios/historico\_\{id\_planta\}.csv}.
+    %
+    \item Cria uma URL assinada (\textit{Signed URL v4}) temporária e segura, com validade restrita de 1 hora e método \texttt{GET}, devolvendo esse link para o aplicativo realizar o download do arquivo.
+\end{enumerate}
 % --
 % ---
 
@@ -401,18 +522,28 @@ Interface administrativa dividida em três blocos principais de controle:
 % --- CONCLUSÃO
 \section*{Conclusão e Trabalhos Futuros}
 \addcontentsline{toc}{section}{Conclusão e Trabalhos Futuros}
-Super texto da conclusão
+O Lumees eleva o nível do cuidado com plantas ao unir IoT, computação em nuvem e inteligência artificial em uma única solução inteligente. Mais do que monitorar dados, o sistema elimina as incertezas do cultivo, oferecendo acompanhamento preciso, interativo e acessível. Com potencial de expansão para novas espécies e automação completa da rega, o Lumees se posiciona como a plataforma definitiva para transformar a forma como as pessoas cuidam de suas plantas.
 
 % -- Melhorias Futuras
 \subsection{Propostas de Melhorias Futuras}
-Melhorias
+\begin{itemize}
+    \item IA especializada para diferentes espécies de plantas.
+    \item Rega autônoma baseada em decisões inteligentes.
+    \item Plataforma escalável preparada para o futuro da jardinagem conectada.
+    \item Expansão da Inteligência Artificial Lee para novas espécies e perfis de cultivo.
+    \item Evolução do avatar virtual, tornando a interação mais dinâmica e personalizada.
+    \item Experiência gamificada para aumentar o engajamento do usuário.
+    \item Criação de recomendações automáticas de cuidados para plantas.
+    \item Ampliação do histórico analítico complexo com previsões e tendências de saúde vegetal.
+    \item Consolidação do Lumees como uma plataforma completa para jardinagem inteligente.
+\end{itemize}
 % --
 % ---
 
 
-\begin{citacao}
+%\begin{citacao}
 
-\end{citacao}
+%\end{citacao}
 
 
 
@@ -424,49 +555,6 @@ Melhorias
 % ----------------------------------------------------------
 % Referências bibliográficas
 % ----------------------------------------------------------
-\bibliography{abntex2-modelo-references}
-
-% ----------------------------------------------------------
-% Glossário
-% ----------------------------------------------------------
-%
-% Há diversas soluções prontas para glossário em LaTeX. 
-% Consulte o manual do abnTeX2 para obter sugestões.
-%
-%\glossary
-
-% ----------------------------------------------------------
-% Apêndices
-% ----------------------------------------------------------
-
-% ---
-% Inicia os apêndices
-% ---
-\begin{apendicesenv}
-
-% ----------------------------------------------------------
-\chapter{Nullam elementum urna vel imperdiet sodales elit ipsum pharetra ligula
-ac pretium ante justo a nulla curabitur tristique arcu eu metus}
-% ----------------------------------------------------------
-
-\end{apendicesenv}
-% ---
-
-% ----------------------------------------------------------
-% Anexos
-% ----------------------------------------------------------
-\cftinserthook{toc}{AAA}
-% ---
-% Inicia os anexos
-% ---
-%\anexos
-\begin{anexosenv}
-
-% ---
-\chapter{Cras non urna sed feugiat cum sociis natoque penatibus et magnis dis
-parturient montes nascetur ridiculus mus}
-% ---
-
-\end{anexosenv}
+\bibliography{artigo}
 
 \end{document}
