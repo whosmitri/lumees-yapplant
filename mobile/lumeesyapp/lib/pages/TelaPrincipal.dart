@@ -177,10 +177,10 @@ class _TelaPrincipalWidgetState extends State<TelaPrincipalWidget> {
         showUnselectedLabels: false,
         elevation: 8, // Mantém a sombrinha no menu inferior
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Stats'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Principal'),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Dashboard'),
           BottomNavigationBarItem(icon: Icon(CupertinoIcons.sparkles), label: 'IA'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'User'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Usuário'),
         ],
       ),
     );
