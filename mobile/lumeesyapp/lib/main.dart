@@ -27,11 +27,12 @@ class LumeesApp extends StatelessWidget {
 
       routes: {
         // adicionar depois
-        // '/autenticacao': (context) => const TelaAutenticacao(),
-        '/principal': (context) => const TelaPrincipalWidget(),
-        '/dashboard': (context) => const TelaDashboardWidget(),
-        '/diagnostico': (context) => const TelaDiagnostico(),
-        '/relatorio': (context) => const TelaRelatorio(),
+        // '/autenticacao': (_) => const TelaAutenticacao(),
+        '/principal': (_) => const TelaPrincipalWidget(),
+        '/dashboard': (_) => const TelaDashboardWidget(),
+        '/diagnostico': (_) => const TelaDiagnostico(),
+        '/relatorio': (_) => const TelaRelatorio(),
+        // // '/autenticacao': (_) => const TelaUsuario(),
       },
     );
   }

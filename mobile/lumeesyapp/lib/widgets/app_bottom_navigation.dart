@@ -3,12 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
-import '../pages/TelaPrincipal.dart';
-import '../pages/TelaDashboard.dart';
-import '../pages/TelaDiagnostico.dart';
-import '../pages/TelaRelatorio.dart';
-// import '../pages/TelaUsuario.dart';
-
 class AppBottomNavigation extends StatelessWidget {
   final int currentIndex;
 
@@ -20,39 +14,44 @@ class AppBottomNavigation extends StatelessWidget {
   void _navigate(BuildContext context, int index) {
     if (index == currentIndex) return;
 
-    Widget page;
+    String route = "";
 
     switch (index) {
       case 0:
-        page = const TelaPrincipalWidget();
+        route = '/principal';
         break;
 
       case 1:
-        page = const TelaDashboardWidget();
+        route = '/dashboard';
         break;
 
       case 2:
-        page = const TelaDiagnostico();
+        route = '/diagnostico';
         break;
 
       case 3:
-        page = const TelaRelatorio();
+        route = '/relatorio';
         break;
 
       //case 4:
-      //  page = const TelaUsuario();
+      // route = '/usuario';
       //  break;
 
       default:
-        page = const TelaPrincipalWidget();
+        route = '/principal';;
     }
 
-    Navigator.pushReplacement(
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      route,
+      (route) => false,
+    );
+
+    /*Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (_) => page,
       ),
-    );
+    ); */
   }
 
   @override
