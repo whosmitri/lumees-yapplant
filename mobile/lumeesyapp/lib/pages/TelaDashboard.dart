@@ -15,16 +15,10 @@ class TelaDashboardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppTheme.mainIvory,
         elevation: 0,
         centerTitle: false,
-        title: Text(
-          'Dashboard',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: AppTheme.mainDark,
-                fontWeight: FontWeight.bold,
-              ),
-        ),
+        title: Text('Dashboard'),
+        automaticallyImplyLeading: false,
       ),
 
       body: SafeArea(

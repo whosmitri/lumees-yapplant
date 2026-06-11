@@ -41,18 +41,11 @@ class _TelaRelatorioState extends State<TelaRelatorio> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.mainIvory,
 
       appBar: AppBar(
-        backgroundColor: AppTheme.mainIvory,
-        foregroundColor: AppTheme.mainDark,
         elevation: 0,
-        title: const Text(
-          'Relatório CSV',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: const Text('Relatório CSV'),
+        automaticallyImplyLeading: false,
       ),
 
       body: SafeArea(

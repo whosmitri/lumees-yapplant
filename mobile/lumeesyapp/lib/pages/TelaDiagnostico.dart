@@ -87,10 +87,10 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.mainIvory,
 
       appBar: AppBar(
         title: const Text("Diagnóstico do Lee IA"),
+        automaticallyImplyLeading: false,
       ),
 
       body: SafeArea(
