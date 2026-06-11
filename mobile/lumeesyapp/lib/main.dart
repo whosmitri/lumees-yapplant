@@ -5,7 +5,7 @@ import 'pages/TelaHome.dart';
 import 'pages/TelaPrincipal.dart';
 import 'pages/TelaDashboard.dart';
 import 'pages/TelaRelatorio.dart';
-//import 'pages/TelaDiagnostico.dart';
+import 'pages/TelaDiagnostico.dart';
 //import 'pages/TelaUsuario.dart';
 
 void main() {
@@ -30,6 +30,7 @@ class LumeesApp extends StatelessWidget {
         // '/autenticacao': (context) => const TelaAutenticacao(),
         '/principal': (context) => const TelaPrincipalWidget(),
         '/dashboard': (context) => const TelaDashboardWidget(),
+        '/diagnostico': (context) => const TelaDiagnostico(),
         '/relatorio': (context) => const TelaRelatorio(),
       },
     );

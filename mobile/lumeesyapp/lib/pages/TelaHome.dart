@@ -75,7 +75,7 @@ class TelaHome extends StatelessWidget {
                               onPressed: () {
                                 Navigator.pushNamed(
                                   context,
-                                  '/principal',
+                                  '/diagnostico',
                                 );
                               },
                               style: ElevatedButton.styleFrom(
