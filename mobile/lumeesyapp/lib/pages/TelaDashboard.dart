@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../theme/app_theme.dart';
+import '../widgets/app_bottom_navigation.dart';
 import '../widgets/soil_humidity_chart.dart';
 import '../widgets/light_chart.dart';
 import '../widgets/temperature_chart.dart';
@@ -154,6 +155,9 @@ class TelaDashboardWidget extends StatelessWidget {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: const AppBottomNavigation(
+        currentIndex: 1,
       ),
     );
   }

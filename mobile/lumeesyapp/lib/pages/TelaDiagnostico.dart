@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
+import '../widgets/app_bottom_navigation.dart';
 
 class TelaDiagnostico extends StatefulWidget {
   const TelaDiagnostico({super.key});
@@ -255,6 +257,9 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: const AppBottomNavigation(
+        currentIndex: 2,
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
+import '../widgets/app_bottom_navigation.dart';
 
 class TelaRelatorio extends StatefulWidget {
   const TelaRelatorio({super.key});
@@ -257,6 +259,9 @@ class _TelaRelatorioState extends State<TelaRelatorio> {
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: const AppBottomNavigation(
+        currentIndex: 3,
       ),
     );
   }
