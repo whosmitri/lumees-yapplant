@@ -2,13 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
-
-void main() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: TelaPrincipalWidget(),
-  ));
-}
+import '../theme/app_theme.dart';
 
 /// ===============================================================
 /// MODELOS
@@ -87,9 +81,6 @@ String obterEstacaoDoAno(Position posicao) {
   }
 }
 
-/// ===============================================================
-/// TELA PRINCIPAL
-/// ===============================================================
 class TelaPrincipalWidget extends StatefulWidget {
   const TelaPrincipalWidget({super.key});
 
@@ -101,11 +92,6 @@ class _TelaPrincipalWidgetState extends State<TelaPrincipalWidget> {
   int _currentIndex = 0;
   Position? _posicao;
   String _estacao = "Carregando...";
-
-  // Cores do App centralizadas para facilitar
-  final Color _bgCor = const Color(0xFFFBFDF0);
-  final Color _textoCor = const Color(0xFF17180D);
-  final Color _inativoCor = const Color(0xFFB1B59B);
 
   @override
   void initState() {
@@ -129,13 +115,14 @@ class _TelaPrincipalWidgetState extends State<TelaPrincipalWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bgCor,
+      backgroundColor: AppTheme.mainIvory, // Puxando do seu tema
       appBar: AppBar(
-        backgroundColor: _bgCor,
-        elevation: 2,
+        backgroundColor: AppTheme.mainIvory, // Mesma cor do fundo
+        elevation: 0, // Tiramos a sombra para fundir 100% com o fundo
+        scrolledUnderElevation: 0, // Evita mudança de cor ao rolar (Material 3)
         title: Text(
           'Bem-vindo!!',
-          style: GoogleFonts.interTight(fontSize: 22, color: _textoCor),
+          style: GoogleFonts.interTight(fontSize: 22, color: AppTheme.mainDark),
         ),
       ),
       body: StreamBuilder<Planta>(
@@ -151,7 +138,7 @@ class _TelaPrincipalWidgetState extends State<TelaPrincipalWidget> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                color: _bgCor,
+                color: AppTheme.mainIvory,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -163,10 +150,14 @@ class _TelaPrincipalWidgetState extends State<TelaPrincipalWidget> {
                 ),
               ),
               const SizedBox(height: 10),
+              Text(
+                "Estação: $_estacao",
+                style: GoogleFonts.inter(fontSize: 16, color: AppTheme.mainDark),
+              ),
+              const SizedBox(height: 20),
               const Expanded(
                 child: Center(
                   child: Image(
-                    // O caminho da imagem já está ajustado para sua pasta!
                     image: AssetImage('assets/images/estados_planta/estado-normal.png'),
                   ),
                 ),
@@ -178,12 +169,13 @@ class _TelaPrincipalWidgetState extends State<TelaPrincipalWidget> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
-        selectedItemColor: _textoCor,
-        unselectedItemColor: _inativoCor,
-        backgroundColor: _bgCor,
+        selectedItemColor: AppTheme.mainDark, // Ícone selecionado escuro
+        unselectedItemColor: AppTheme.auxOlive, // Ícone inativo num verde mais discreto
+        backgroundColor: AppTheme.mainIvory,
         type: BottomNavigationBarType.fixed,
         showSelectedLabels: false,
         showUnselectedLabels: false,
+        elevation: 8, // Mantém a sombrinha no menu inferior
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Stats'),
@@ -195,9 +187,6 @@ class _TelaPrincipalWidgetState extends State<TelaPrincipalWidget> {
   }
 }
 
-/// ===============================================================
-/// WIDGET DE CARD REUTILIZÁVEL
-/// ===============================================================
 class _InfoCard extends StatelessWidget {
   final String title;
   final String value;
@@ -208,11 +197,19 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(title, textAlign: TextAlign.center),
+        Text(
+          title, 
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: AppTheme.mainDark), // Texto escuro
+        ),
         const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 20, 
+            fontWeight: FontWeight.bold,
+            color: AppTheme.mainGreen, // Valores em destaque com o seu verde!
+          ),
         ),
       ],
     );

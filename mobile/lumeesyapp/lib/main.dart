@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
-import 'pages/TelaHome.dart';
 import 'theme/app_theme.dart';
+
+import 'pages/TelaHome.dart';
+import 'pages/TelaPrincipal.dart';
+import 'pages/TelaDashboard.dart';
+import 'pages/TelaRelatorio.dart';
+//import 'pages/TelaDiagnostico.dart';
+//import 'pages/TelaUsuario.dart';
 
 void main() {
   runApp(const LumeesApp());
@@ -22,8 +28,9 @@ class LumeesApp extends StatelessWidget {
       routes: {
         // adicionar depois
         // '/autenticacao': (context) => const TelaAutenticacao(),
-        // '/dashboard': (context) => const TelaDashboard(),
-        // '/relatorio': (context) => const TelaRelatorio(),
+        '/principal': (context) => const TelaPrincipalWidget(),
+        '/dashboard': (context) => const TelaDashboardWidget(),
+        '/relatorio': (context) => const TelaRelatorio(),
       },
     );
   }

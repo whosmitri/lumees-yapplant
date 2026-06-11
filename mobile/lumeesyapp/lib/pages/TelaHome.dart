@@ -27,7 +27,7 @@ class TelaHome extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.asset(
-                    'assets/images/lumees-logo-claro.png',
+                    'assets/images/logo/lumees-logo-claro.png',
                     width: 200,
                   ),
                 ),
