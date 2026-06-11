@@ -30,7 +30,7 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
       carregando = false;
       possuiResultado = true;
 
-      estadoClassificado = "Saudável";
+      estadoClassificado = "razoável";
 
       textoExplicativo =
           "Sua planta apresentou uma boa estabilidade da umidade do solo durante os últimos sete dias. O modelo KNN identificou que os valores permanecem dentro da faixa considerada saudável. Continue mantendo os cuidados atuais.";
@@ -40,16 +40,19 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
 
   Color getCorDiagnostico() {
     switch (estadoClassificado.toLowerCase()) {
-      case "saudável":
-      case "saudavel":
-        return Colors.green;
+      case "excelente":
+        return Colors.green.shade700;
 
-      case "atenção":
-      case "atencao":
-        return Colors.orange;
+      case "bom":
+        return AppTheme.mainGreen;
+
+      case "razoável":
+        return Colors.amber.shade700;
+
+      case "ruim":
+        return Colors.orange.shade700;
 
       case "crítico":
-      case "critico":
         return AppTheme.auxDanger;
 
       default:
@@ -59,17 +62,20 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
 
   IconData getIconeDiagnostico() {
     switch (estadoClassificado.toLowerCase()) {
-      case "saudável":
-      case "saudavel":
+      case "excelente":
+        return Icons.sentiment_very_satisfied;
+
+      case "bom":
         return Icons.check_circle;
 
-      case "atenção":
-      case "atencao":
+      case "razoável":
+        return Icons.sentiment_neutral;
+
+      case "ruim":
         return Icons.warning_amber_rounded;
 
       case "crítico":
-      case "critico":
-        return Icons.error;
+        return Icons.dangerous;
 
       default:
         return Icons.info;
