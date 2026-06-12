@@ -103,15 +103,11 @@ def analisar_planta(dados: RequisicaoAnalise):
     
     # 2. conexão com o firebase
     try:
-        print('1 - entrou na IA')
         db = firestore.client()  # puxa o cliente conectado lá no main.py
-        print('2 - cliente fb ok')
         
         # buscando o documento da planta específica
         ref_doc_planta = db.collection("plantas").document(dados.id_planta)
-        print('3 - doc obtido')
         doc_planta = ref_doc_planta.get()
-        print('4 - doc lido')
         
         # em caso de falha:
         if not doc_planta.exists:
