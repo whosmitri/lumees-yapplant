@@ -111,7 +111,7 @@ def analisar_planta(dados: RequisicaoAnalise):
         
         # em caso de falha:
         if not doc_planta.exists:
-            raise HTTPException(status_code=404, detail="Planta não encontrada no Firebase.")
+            raise HTTPException(status_code=404, detail="Planta não encontrada, verifique se você tem mesmo uma planta cadastrada")
         
         # transforma a resposta do firebase em dicionário python
         dados_firebase = doc_planta.to_dict()
@@ -125,7 +125,7 @@ def analisar_planta(dados: RequisicaoAnalise):
         
     except Exception as e:
         if isinstance(e, HTTPException): raise e
-        raise HTTPException(status_code=500, detail=f"Erro ao conectar ao Firebase: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro ao conectar à base de dados: {e}")
 
     
     # 3. execução do modelo ia
