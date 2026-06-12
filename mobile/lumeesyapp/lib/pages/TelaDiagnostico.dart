@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_bottom_navigation.dart';
 
@@ -16,29 +17,41 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
 
   String estadoClassificado = '';
   String textoExplicativo = '';
+  String? mensagemErro;
 
+  // =================
+  // API
   Future<void> analisarPlanta() async {
     setState(() {
       carregando = true;
       possuiResultado = false;
     });
 
-    // =================
-    // SIMULAÇÃO DA API
+    try {
+      final resultado =
+          await ApiService.analisarPlanta();
 
-    await Future.delayed(const Duration(seconds: 2));
+      setState(() {
+          estadoClassificado = resultado["estado_classificado"];
+          textoExplicativo = resultado["texto_explicativo"];
 
-    setState(() {
-      carregando = false;
-      possuiResultado = true;
+          possuiResultado = true;
+      });
+    }
 
-      estadoClassificado = "Excelente";
+    catch(e){
+      setState(() {
+        mensagemErro = e.toString();
+      });
+    }
 
-      textoExplicativo =
-          "Análise concluída! Sua plantinha está em excelentes condições. Os sensores indicam um ambiente saudável e favorável ao crescimento. Continue com esse cuidado incrível!";
-    });
-    // =================
+    finally{
+        setState((){
+            carregando = false;
+        });
+    }
   }
+  // =================
 
   Color getCorDiagnostico() {
     switch (estadoClassificado.toLowerCase()) {
@@ -151,6 +164,34 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
                           style: AppTheme.bodyMedium,
                         ),
                       ],
+                    ),
+
+                  if (mensagemErro != null)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: AppTheme.auxDanger.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppTheme.auxDanger),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: AppTheme.auxDanger,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              mensagemErro!,
+                              style: const TextStyle(
+                                color: AppTheme.mainDark,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                   if (possuiResultado) ...[
