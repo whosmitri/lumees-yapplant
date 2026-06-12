@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import firebase_admin
 from firebase_admin import credentials
 from routers import ia, hardware, report
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.testclient import TestClient
 
 # configurando o ciclo de vida (Lifespan) para iniciar o firebase
@@ -26,7 +27,17 @@ async def lifespan(app: FastAPI):
     # apenas notificando o encerramento
     print("Encerrando aplicação...")
 
+# cria o app
 app = FastAPI(title="Lumees Yapp API", lifespan=lifespan)
+
+# CORS para acesso via web
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # modularidade:
 app.include_router(ia.router, prefix="/lumees-api/v1", tags=["Inteligência Artificial"]) # rota da análise de IA
