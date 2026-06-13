@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
 import 'pages/TelaHome.dart';
 import 'pages/TelaPrincipal.dart';
 import 'pages/TelaDashboard.dart';
@@ -8,9 +11,17 @@ import 'pages/TelaRelatorio.dart';
 import 'pages/TelaDiagnostico.dart';
 //import 'pages/TelaUsuario.dart';
 
-void main() {
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const LumeesApp());
 }
+
 
 class LumeesApp extends StatelessWidget {
   const LumeesApp({super.key});
