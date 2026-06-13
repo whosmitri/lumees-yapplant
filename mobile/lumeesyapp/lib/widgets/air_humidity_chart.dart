@@ -48,7 +48,7 @@ class AirHumidityChart extends StatelessWidget {
               Icon(
                 Icons.cloud_queue_rounded,
                 size: 22,
-                color: barColor,
+                color: Color(0xFF7DD3FC),
               ),
               SizedBox(width: 8),
               Text(
