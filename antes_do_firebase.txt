@@ -1,1 +1,0 @@
-este é apenas um arquivo para fazer um commit de backup antes de fazer a integração flutter-firebase
