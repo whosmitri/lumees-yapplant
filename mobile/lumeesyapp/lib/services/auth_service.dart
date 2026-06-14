@@ -5,8 +5,11 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // constante da coleção de usuários
+  static const usuarios = 'usuarios';
+
   // retorna o usuário atualmente autenticado
-  // User? get currentUser => _auth.currentUser;
+  User? get currentUser => _auth.currentUser;
 
   // monitora em tempo real as alterações de autenticação
   Stream<User?> get authStateChanges => _auth.authStateChanges();
@@ -34,7 +37,7 @@ class AuthService {
 
       if (user != null) {
         // salva o modelo de dados no Cloud Firestore
-        await _firestore.collection('usuarios').doc(user.uid).set({
+        await _firestore.collection(usuarios).doc(user.uid).set({
           'uid': user.uid,
           'nome': nome,
           'email': email,
