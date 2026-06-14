@@ -4,6 +4,8 @@ import 'theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+import 'services/auth_service.dart';
+
 import 'pages/TelaHome.dart';
 import 'pages/TelaPrincipal.dart';
 import 'pages/TelaDashboard.dart';
@@ -20,6 +22,12 @@ Future<void> main() async {
   );
 
   runApp(const LumeesApp());
+
+  final auth = AuthService();
+
+  await auth.signInAnonymously();
+
+  print(auth.currentUser?.uid);
 }
 
 
