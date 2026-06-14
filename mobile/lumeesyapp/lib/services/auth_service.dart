@@ -48,7 +48,24 @@ class AuthService {
     }
   }
 
-  // método de sair da conta (deslogar ou sign out)
+  // LOGIN (para usuários já existentes)
+  Future<User?> logarUsuario({
+    required String email,
+    required String senha,
+  }) async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: senha,
+      );
+      return userCredential.user;
+    } catch (e) {
+      print("Erro ao logar usuário: $e");
+      return null;
+    }
+  }
+
+  // LOGOUT (deslogar, sair da conta ou sign out)
   Future<void> signOut() async {
     await _auth.signOut();
   }
