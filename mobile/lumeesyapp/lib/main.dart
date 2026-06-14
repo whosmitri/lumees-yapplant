@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-
-import 'services/auth_service.dart';
+import './services/firebase_service.dart';
 
 import 'pages/TelaHome.dart';
 import 'pages/TelaPrincipal.dart';
@@ -17,10 +14,10 @@ import 'pages/TelaDiagnostico.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // inicializa firebase
+  await FirebaseService.initialize();
 
+  // inicializa o app
   runApp(const LumeesApp());
 }
 
