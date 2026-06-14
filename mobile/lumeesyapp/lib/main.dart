@@ -22,12 +22,6 @@ Future<void> main() async {
   );
 
   runApp(const LumeesApp());
-
-  final auth = AuthService();
-
-  await auth.signInAnonymously();
-
-  print(auth.currentUser?.uid);
 }
 
 
