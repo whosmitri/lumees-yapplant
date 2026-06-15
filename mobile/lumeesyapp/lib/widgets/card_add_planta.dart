@@ -165,7 +165,7 @@ class _CardAddPlantaState extends State<CardAddPlanta> {
 
                 items: especies.map((item) {
                 return DropdownMenuItem<String>(
-                  value: item['nome_comum'],
+                  value: item['id_especie'],
 
                   child: Text(
                     item['nome_comum'],
