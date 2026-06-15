@@ -58,7 +58,7 @@ class TabLoginState extends State<TabLogin> {
       );
     } else {
       Navigator.of(context).pushNamedAndRemoveUntil(
-        '/dashboard',
+        '/add_planta',
         (route) => false,
       );
     }
