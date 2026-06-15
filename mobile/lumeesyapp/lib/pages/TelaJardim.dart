@@ -280,7 +280,7 @@ class _TelaJardimState extends State<TelaJardim> {
 
                     // BALÃO DE FALA
                     Positioned(
-                      top: bgAltura * 0.15, // posiciona a 15% do topo da área visível do fundo
+                      top: bgAltura * 0.10, // posiciona a 10% do topo da área visível do fundo
                       left: 0,
                       right: 0,
                       child: Center(
@@ -288,7 +288,7 @@ class _TelaJardimState extends State<TelaJardim> {
                           width: 180,
                           height: 52,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppTheme.mainIvory,
                             borderRadius: BorderRadius.circular(100),
                           ),
                           alignment: Alignment.center,
@@ -352,6 +352,8 @@ class _TelaJardimState extends State<TelaJardim> {
                                 ],
                               ),
 
+                              const SizedBox(height: 18),
+
                               Wrap(
                                 spacing: 18,
                                 runSpacing: 18,
@@ -373,6 +375,8 @@ class _TelaJardimState extends State<TelaJardim> {
                                   ),
                                 ],
                               ),
+
+                              const SizedBox(height: 18),
 
                               Wrap(
                                 spacing: 18,
