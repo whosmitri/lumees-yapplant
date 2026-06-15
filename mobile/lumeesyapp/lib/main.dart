@@ -4,6 +4,7 @@ import 'theme/app_theme.dart';
 import './services/firebase_service.dart';
 
 import 'pages/TelaHome.dart';
+import 'pages/TelaAuth.dart';
 import 'pages/TelaPrincipal.dart';
 import 'pages/TelaDashboard.dart';
 import 'pages/TelaRelatorio.dart';
@@ -37,7 +38,7 @@ class LumeesApp extends StatelessWidget {
 
       routes: {
         // adicionar depois
-        // '/autenticacao': (_) => const TelaAutenticacao(),
+        '/autenticacao': (_) => const TelaAuth(),
         '/principal': (_) => const TelaPrincipalWidget(),
         '/dashboard': (_) => const TelaDashboardWidget(),
         '/diagnostico': (_) => const TelaDiagnostico(),
