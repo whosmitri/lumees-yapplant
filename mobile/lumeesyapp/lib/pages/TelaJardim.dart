@@ -129,7 +129,7 @@ class _TelaJardimState extends State<TelaJardim> {
     if (_especie == null) {
       return {
         'frase': "Carregando...",
-        'imagem': "assets/images/estados_planta/estado-normal.png",
+        'imagem': "assets/images/estados_planta/estado_normal.png",
       };
     }
 
@@ -146,27 +146,27 @@ class _TelaJardimState extends State<TelaJardim> {
     if (umidadeAtual > uMax) {
       return {
         'frase': "Estou encharcada!",
-        'imagem': "assets/images/estados_planta/estado-encharcado.png",
+        'imagem': "assets/images/estados_planta/estado_encharcado.png",
       };
     } else if (umidadeAtual < uMin) {
       return {
         'frase': "Estou com sede!",
-        'imagem': "assets/images/estados_planta/estado-sede.png",
+        'imagem': "assets/images/estados_planta/estado_sede.png",
       };
     } else if (luxAtual > lMax) {
       return {
         'frase': "Estou com calor!",
-        'imagem': "assets/images/estados_planta/estado-calor.png",
+        'imagem': "assets/images/estados_planta/estado_calor.png",
       };
     } else if (luxAtual < lMin) {
       return {
         'frase': "Estou com frio...",
-        'imagem': "assets/images/estados_planta/estado-frio.png",
+        'imagem': "assets/images/estados_planta/estado_frio.png",
       };
     } else {
       return {
         'frase': "Estou bem!!",
-        'imagem': "assets/images/estados_planta/estado-normal.png",
+        'imagem': "assets/images/estados_planta/estado_normal.png",
       };
     }
   }
