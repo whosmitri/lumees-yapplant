@@ -18,7 +18,7 @@ class AppBottomNavigation extends StatelessWidget {
 
     switch (index) {
       case 0:
-        route = '/principal';
+        route = '/jardim';
         break;
 
       case 1:
@@ -38,7 +38,7 @@ class AppBottomNavigation extends StatelessWidget {
       //  break;
 
       default:
-        route = '/principal';;
+        route = '/jardim';;
     }
 
     Navigator.of(context).pushNamedAndRemoveUntil(

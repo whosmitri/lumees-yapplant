@@ -8,6 +8,7 @@ import '../services/location_service.dart';
 
 import '../theme/app_theme.dart';
 
+import '../widgets/app_bottom_navigation.dart';
 import '../widgets/card_sensor.dart';
 import '../widgets/card_info.dart';
 
@@ -294,6 +295,10 @@ class _TelaJardimState extends State<TelaJardim> {
             );
           },
         ),
+      ),
+
+      bottomNavigationBar: const AppBottomNavigation(
+        currentIndex: 0,
       ),
     );
   }
