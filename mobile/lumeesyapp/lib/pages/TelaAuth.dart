@@ -65,7 +65,7 @@ class TelaAuth extends StatelessWidget {
                         child: Card(
                           color: AppTheme.mainIvory,
                           elevation: 10,
-                          shadowColor: Colors.black.withAlpha(50),
+                          shadowColor: Colors.black.withValues(alpha: 0.2),
 
                           child: const Padding(
                             padding: EdgeInsets.all(24),
