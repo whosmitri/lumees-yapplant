@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import '../services/database_service.dart';
 
 import '../theme/app_theme.dart';
 
@@ -14,6 +15,7 @@ class TabLogin extends StatefulWidget {
 class TabLoginState extends State<TabLogin> {
 
   final AuthService _authService = AuthService();
+  final DatabaseService _databaseService = DatabaseService();
 
   String email = '';
   String senha = '';
@@ -44,7 +46,22 @@ class TabLoginState extends State<TabLogin> {
       return;
     }
 
-    // a etapa 5 (verificar se o user tem plantinha) vai ficar aqui (pelo menos até onde eu planejei)
+    final possuiPlanta =
+    await _databaseService.usuarioPossuiPlanta(
+      resultado.usuario!.uid,
+    );
+
+    if (possuiPlanta) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/principal',
+        (route) => false,
+      );
+    } else {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/dashboard',
+        (route) => false,
+      );
+    }
   }
 
   @override
