@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/tab_signup.dart';
-//import '../widgets/aba_login.dart';
+import '../widgets/tab_login.dart';
 
 class TelaAuth extends StatelessWidget {
   const TelaAuth({super.key});
@@ -98,8 +98,7 @@ class TelaAuth extends StatelessWidget {
 
                                     children: [
                                       TabSignup(),
-                                      Text('login')
-                                      //AbaLogin(),
+                                      TabLogin(),
                                     ],
                                   ),
                                 ),
