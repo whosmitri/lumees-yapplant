@@ -15,7 +15,7 @@ class TelaHome extends StatelessWidget {
           height: double.infinity,
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/images/bgs/bg_home.png'),
+              image: AssetImage('assets/images/bgs/bg_home.jpg'),
               fit: BoxFit.cover,
             ),
           ),
