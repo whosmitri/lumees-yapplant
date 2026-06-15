@@ -5,8 +5,14 @@ import '../theme/app_theme.dart';
 import '../widgets/card_sensor.dart';
 import '../widgets/card_info.dart';
 
-class TelaJardim extends StatelessWidget {
+class TelaJardim extends StatefulWidget {
   const TelaJardim({super.key});
+
+  @override
+  State<TelaJardim> createState() => _TelaJardimState();
+}
+
+class _TelaJardimState extends State<TelaJardim> {
 
   @override
   Widget build(BuildContext context) {
