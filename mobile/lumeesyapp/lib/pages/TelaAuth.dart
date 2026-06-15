@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
-//import '../widgets/aba_cadastro.dart';
+import '../widgets/tab_signup.dart';
 //import '../widgets/aba_login.dart';
 
 class TelaAuth extends StatelessWidget {
@@ -97,9 +97,8 @@ class TelaAuth extends StatelessWidget {
                                   child: TabBarView(
 
                                     children: [
-                                      Text('cadastro'),
+                                      TabSignup(),
                                       Text('login')
-                                      //AbaCadastro(),
                                       //AbaLogin(),
                                     ],
                                   ),
