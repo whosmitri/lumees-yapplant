@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
-import '../pages/TelaDashboard.dart';
-//import '../pages/TelaAddPlanta.dart';
 
 import '../theme/app_theme.dart';
 
