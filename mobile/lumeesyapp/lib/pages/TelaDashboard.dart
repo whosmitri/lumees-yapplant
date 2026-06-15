@@ -1,22 +1,139 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 
+import '../services/auth_service.dart';
+import '../services/database_service.dart';
 import '../widgets/app_bottom_navigation.dart';
 import '../widgets/air_humidity_chart.dart';
 import '../widgets/light_chart.dart';
 import '../widgets/soil_humidity_chart.dart';
 import '../widgets/temperature_chart.dart';
 
-class TelaDashboardWidget extends StatelessWidget {
+class TelaDashboardWidget extends StatefulWidget {
   const TelaDashboardWidget({super.key});
+
+  @override
+  State<TelaDashboardWidget> createState() => _TelaDashboardWidgetState();
+}
+
+class _TelaDashboardWidgetState extends State<TelaDashboardWidget> {
+  final AuthService _authService = AuthService();
+  final DatabaseService _databaseService = DatabaseService();
+
+  bool _carregando = true;
+  String? _erro;
+
+  // Listas locais contendo os tipos exatos dos seus gráficos estruturados na hora
+  List<SoilHumidityData> _dadosSolo = [];
+  List<LightData> _dadosLuminosidade = [];
+  List<TemperatureData> _dadosTemperatura = [];
+  List<AirHumidityData> _dadosAr = [];
+
+  StreamSubscription? _plantaSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _inicializarDashboard();
+  }
+
+  @override
+  void dispose() {
+    _plantaSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _inicializarDashboard() async {
+    final usuario = _authService.currentUser;
+    if (usuario == null) {
+      setState(() {
+        _erro = 'Usuário não autenticado.';
+        _carregando = false;
+      });
+      return;
+    }
+
+    // Escuta em tempo real para pegar o id_planta correto do usuário
+    _plantaSubscription = _databaseService.buscarPlanta(usuario.uid).listen((snapshot) async {
+      if (snapshot.docs.isEmpty) {
+        setState(() {
+          _erro = 'Nenhuma planta cadastrada.';
+          _carregando = false;
+        });
+        return;
+      }
+
+      final dadosPlanta = snapshot.docs.first.data();
+      final idPlanta = dadosPlanta['id_planta'] as String?;
+
+      if (idPlanta == null || idPlanta.isEmpty) {
+        setState(() {
+          _erro = 'Planta sem ID válido.';
+          _carregando = false;
+        });
+        return;
+      }
+
+      // Busca o histórico das últimas 5 horas
+      final historico = await _databaseService.buscarHistoricoUltimasHoras(idPlanta);
+
+      // Limpar e reconstruir as listas para os gráficos
+      final List<SoilHumidityData> solo = [];
+      final List<LightData> luz = [];
+      final List<TemperatureData> temp = [];
+      final List<AirHumidityData> ar = [];
+
+      for (var leitura in historico) {
+        final timestamp = leitura['timestamp'] as Timestamp?;
+        if (timestamp == null) continue;
+
+        // Formata a hora para exibir no gráfico (ex: "14h")
+        final horaTexto = '${timestamp.toDate().hour}h';
+
+        solo.add(SoilHumidityData(
+          hour: horaTexto,
+          humidity: (leitura['umidade_solo_porcentagem'] ?? 0).toDouble(),
+        ));
+
+        luz.add(LightData(
+          hour: horaTexto,
+          lux: (leitura['luminosidade'] ?? 0).toDouble(),
+        ));
+
+        temp.add(TemperatureData(
+          hour: horaTexto,
+          temperature: (leitura['temperatura_ar'] ?? 0).toDouble(),
+        ));
+
+        ar.add(AirHumidityData(
+          hour: horaTexto,
+          humidity: (leitura['umidade_ar'] ?? 0).toDouble(),
+        ));
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _dadosSolo = solo;
+        _dadosLuminosidade = luz;
+        _dadosTemperatura = temp;
+        _dadosAr = ar;
+        _erro = null;
+        _carregando = false;
+      });
+    }, onError: (err) {
+      setState(() {
+        _erro = 'Erro ao carregar dados em tempo real.';
+        _carregando = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
-    // A partir dessa largura mostramos 2 gráficos por linha
     final bool isWideScreen = screenWidth >= 900;
-
-    // Largura máxima de cada card
     final double cardWidth = isWideScreen ? 520 : double.infinity;
 
     return Scaffold(
@@ -26,142 +143,64 @@ class TelaDashboardWidget extends StatelessWidget {
         automaticallyImplyLeading: false,
         title: const Text('Dashboard'),
       ),
-
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 1200,
-            ),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 20,
-                runSpacing: 20,
-
-                children: [
-                  SizedBox(
-                    width: cardWidth,
-                    child: SoilHumidityChart(
-                      data: const [
-                        SoilHumidityData(
-                          hour: '13h',
-                          humidity: 72,
-                        ),
-                        SoilHumidityData(
-                          hour: '14h',
-                          humidity: 58,
-                        ),
-                        SoilHumidityData(
-                          hour: '15h',
-                          humidity: 80,
-                        ),
-                        SoilHumidityData(
-                          hour: '16h',
-                          humidity: 43,
-                        ),
-                        SoilHumidityData(
-                          hour: '17h',
-                          humidity: 67,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(
-                    width: cardWidth,
-                    child: LightChart(
-                      data: const [
-                        LightData(
-                          hour: '13h',
-                          lux: 5200,
-                        ),
-                        LightData(
-                          hour: '14h',
-                          lux: 8100,
-                        ),
-                        LightData(
-                          hour: '15h',
-                          lux: 6800,
-                        ),
-                        LightData(
-                          hour: '16h',
-                          lux: 4200,
-                        ),
-                        LightData(
-                          hour: '17h',
-                          lux: 2100,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(
-                    width: cardWidth,
-                    child: TemperatureChart(
-                      data: const [
-                        TemperatureData(
-                          hour: '13h',
-                          temperature: 28,
-                        ),
-                        TemperatureData(
-                          hour: '14h',
-                          temperature: 31,
-                        ),
-                        TemperatureData(
-                          hour: '15h',
-                          temperature: 34,
-                        ),
-                        TemperatureData(
-                          hour: '16h',
-                          temperature: 32,
-                        ),
-                        TemperatureData(
-                          hour: '17h',
-                          temperature: 27,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(
-                    width: cardWidth,
-                    child: AirHumidityChart(
-                      data: const [
-                        AirHumidityData(
-                          hour: '13h',
-                          humidity: 45,
-                        ),
-                        AirHumidityData(
-                          hour: '14h',
-                          humidity: 78,
-                        ),
-                        AirHumidityData(
-                          hour: '15h',
-                          humidity: 55,
-                        ),
-                        AirHumidityData(
-                          hour: '16h',
-                          humidity: 90,
-                        ),
-                        AirHumidityData(
-                          hour: '17h',
-                          humidity: 62,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+        child: _construirConteudo(cardWidth),
       ),
-
       bottomNavigationBar: const AppBottomNavigation(
         currentIndex: 1,
+      ),
+    );
+  }
+
+  Widget _construirConteudo(double cardWidth) {
+    if (_carregando) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_erro != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Text(_erro!, style: const TextStyle(color: Colors.red, fontSize: 16)),
+        ),
+      );
+    }
+
+    if (_dadosSolo.isEmpty) {
+      return const Center(
+        child: Text('Nenhuma leitura registrada nas últimas 5 horas.'),
+      );
+    }
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1200),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 20,
+            runSpacing: 20,
+            children: [
+              SizedBox(
+                width: cardWidth,
+                child: SoilHumidityChart(data: _dadosSolo),
+              ),
+              SizedBox(
+                width: cardWidth,
+                child: LightChart(data: _dadosLuminosidade),
+              ),
+              SizedBox(
+                width: cardWidth,
+                child: TemperatureChart(data: _dadosTemperatura),
+              ),
+              SizedBox(
+                width: cardWidth,
+                child: AirHumidityChart(data: _dadosAr),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

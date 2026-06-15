@@ -125,4 +125,23 @@ class DatabaseService {
       return null;
     }
   }
+
+  // PLANTAS
+  Future<List<Map<String, dynamic>>> buscarHistoricoUltimasHoras(String idPlanta) async {
+    try {
+      final cincoHorasAtras = DateTime.now().subtract(const Duration(hours: 5));
+      
+      final snapshot = await _db
+          .collection(_plantas)
+          .doc(idPlanta)
+          .collection('historico_leituras')
+          .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(cincoHorasAtras))
+          .orderBy('timestamp', descending: false)
+          .get();
+
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    } catch (_) {
+      return [];
+    }
+  }
 }
