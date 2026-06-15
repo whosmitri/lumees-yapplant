@@ -53,7 +53,7 @@ class TabLoginState extends State<TabLogin> {
 
     if (possuiPlanta) {
       Navigator.of(context).pushNamedAndRemoveUntil(
-        '/principal',
+        '/jardim',
         (route) => false,
       );
     } else {
