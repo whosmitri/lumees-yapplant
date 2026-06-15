@@ -104,7 +104,7 @@ class TabSignupState extends State<TabSignup> {
           // SENHA
           _campoTexto(
             label: 'Senha',
-            obscureText: true,
+            obscureText: !mostrarSenha,
             suffixIcon: IconButton(
               icon: Icon(
                 mostrarSenha
@@ -126,7 +126,7 @@ class TabSignupState extends State<TabSignup> {
           // CONFIRMAR SENHA
           _campoTexto(
             label: 'Confirmar senha',
-            obscureText: true,
+            obscureText: !mostrarConfirmarSenha,
             suffixIcon: IconButton(
               icon: Icon(
                 mostrarConfirmarSenha
