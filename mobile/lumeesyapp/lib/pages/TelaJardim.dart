@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../services/season_service.dart';
+import '../services/time_service.dart';
+import '../services/location_service.dart';
+
 import '../theme/app_theme.dart';
 
 import '../widgets/card_sensor.dart';
@@ -13,6 +17,49 @@ class TelaJardim extends StatefulWidget {
 }
 
 class _TelaJardimState extends State<TelaJardim> {
+
+  final LocationService _locationService = LocationService();
+  final SeasonService _seasonService = SeasonService();
+  final TimeService _timeService = TimeService();
+
+  String _season = "...";
+  String _dayPeriod = "...";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEnvironment();
+  }
+
+  Future<void> _loadEnvironment() async {
+    try {
+      final position = await _locationService.getCurrentLocation();
+
+      final season =_seasonService.getSeason(position.latitude);
+
+      final dayPeriod = await _timeService.getDayPeriod(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _season = season;
+        _dayPeriod = dayPeriod;
+      });
+
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _season = "--";
+        _dayPeriod = "--";
+      });
+
+      debugPrint(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +106,9 @@ class _TelaJardimState extends State<TelaJardim> {
                   right: 0,
                   height: bgAltura, // cresce ou diminui baseado no tamanho da tela
                   child: Image.asset(
-                    "assets/images/bgs/bg_principal_dia.png",
+                    _dayPeriod == "Dia"
+                      ? "assets/images/bgs/bg_principal_dia.png"
+                      : "assets/images/bgs/bg_principal_noite.png",
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -186,13 +235,13 @@ class _TelaJardimState extends State<TelaJardim> {
                               InfoCard(
                                 icon: Icons.energy_savings_leaf_rounded,
                                 iconColor: AppTheme.mainGreen,
-                                texto: "Estação do ano: Outono",
+                                texto: "Estação do ano: $_season",
                               ),
 
                               InfoCard(
                                 icon: Icons.wb_twilight_rounded,
                                 iconColor: AppTheme.mainGreen,
-                                texto: "Período do dia: Dia",
+                                texto: "Período do dia: $_dayPeriod",
                               ),
                             ],
                           )
