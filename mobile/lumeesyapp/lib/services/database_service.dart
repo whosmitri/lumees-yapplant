@@ -102,4 +102,12 @@ class DatabaseService {
       'id_planta': idPlanta,
     });
   }
+
+  // PLANTAS
+  Stream<QuerySnapshot<Map<String, dynamic>>> buscarPlanta(String uid) {
+    return _db
+        .collection(_plantas)
+        .where('uid', isEqualTo: uid)
+        .snapshots();
+  }
 }

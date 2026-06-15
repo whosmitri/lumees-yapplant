@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
+import '../services/database_service.dart';
 import '../services/season_service.dart';
 import '../services/time_service.dart';
 import '../services/location_service.dart';
@@ -18,6 +20,8 @@ class TelaJardim extends StatefulWidget {
 
 class _TelaJardimState extends State<TelaJardim> {
 
+  final AuthService _authService = AuthService();
+  final DatabaseService _databaseService = DatabaseService();
   final LocationService _locationService = LocationService();
   final SeasonService _seasonService = SeasonService();
   final TimeService _timeService = TimeService();
@@ -62,7 +66,7 @@ class _TelaJardimState extends State<TelaJardim> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     final size = MediaQuery.of(context).size;
 
     final bool desktop = size.width >= 1200;
@@ -73,6 +77,16 @@ class _TelaJardimState extends State<TelaJardim> {
 
     final double imagemAltura =
         desktop ? 520 : tablet ? 430 : 330;
+
+    final user = _authService.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(
+          child: Text("Usuário não autenticado"),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppTheme.mainIvory,
@@ -172,6 +186,7 @@ class _TelaJardimState extends State<TelaJardim> {
                     ),
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.fromLTRB(24, 30, 24, 24),
+
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -181,70 +196,95 @@ class _TelaJardimState extends State<TelaJardim> {
                             style: AppTheme.titleMedium,
                           ),
                           const SizedBox(height: 24),
-                          
-                          Wrap(
-                            spacing: 18,
-                            runSpacing: 18,
-                            alignment: WrapAlignment.center,
 
-                            children: [
-                              SensorCard(
-                                icon: Icons.water_drop_rounded,
-                                iconColor: Colors.blue,
-                                titulo: "Umidade do Solo",
-                                valor: "20%",
-                              ),
+                          StreamBuilder(
+                            stream: _databaseService.buscarPlanta(user.uid),
+                            builder: (context, snapshot) {
 
-                              SensorCard(
-                                icon: Icons.wb_sunny_rounded,
-                                iconColor: Colors.amber,
-                                titulo: "Luminosidade",
-                                valor: "3000 lx",
-                              ),
-                            ],
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+
+                              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                return const Text(
+                                  "Nenhuma planta cadastrada.",
+                                );
+                              }
+
+                              final planta = snapshot.data!.docs.first.data();
+
+                              return Column(
+                                children: [
+                                  Wrap(
+                                    spacing: 18,
+                                    runSpacing: 18,
+                                    alignment: WrapAlignment.center,
+
+                                    children: [
+                                      SensorCard(
+                                        icon: Icons.water_drop_rounded,
+                                        iconColor: Colors.blue,
+                                        titulo: "Umidade do Solo",
+                                        valor:"${planta['ultima_leitura']['umidade_solo_porcentagem']}%",
+                                      ),
+
+
+                                      SensorCard(
+                                        icon: Icons.wb_sunny_rounded,
+                                        iconColor: Colors.amber,
+                                        titulo: "Luminosidade",
+                                        valor: "${planta['ultima_leitura']['luminosidade']} lx",
+                                      ),
+                                    ],
+                                  ),
+
+                                  Wrap(
+                                    spacing: 18,
+                                    runSpacing: 18,
+                                    alignment: WrapAlignment.center,
+
+                                    children: [
+                                      SensorCard(
+                                        icon: Icons.thermostat_rounded,
+                                        iconColor: Colors.deepOrange,
+                                        titulo: "Temperatura do Ar",
+                                        valor: "${planta['ultima_leitura']['temperatura_ar']}°C",
+                                      ),
+
+                                      SensorCard(
+                                        icon: Icons.cloud_queue_rounded,
+                                        iconColor: Colors.lightBlue,
+                                        titulo: "Umidade do Ar",
+                                        valor: "${planta['ultima_leitura']['umidade_ar']}%",
+                                      ),
+                                    ],
+                                  ),
+
+                                  Wrap(
+                                    spacing: 18,
+                                    runSpacing: 18,
+                                    alignment: WrapAlignment.center,
+
+                                    children: [
+                                      InfoCard(
+                                        icon: Icons.energy_savings_leaf_rounded,
+                                        iconColor: AppTheme.mainGreen,
+                                        texto: "Estação do ano: $_season",
+                                      ),
+
+                                      InfoCard(
+                                        icon: Icons.wb_twilight_rounded,
+                                        iconColor: AppTheme.mainGreen,
+                                        texto: "Período do dia: $_dayPeriod",
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              );
+                            },
                           ),
-
-                          Wrap(
-                            spacing: 18,
-                            runSpacing: 18,
-                            alignment: WrapAlignment.center,
-
-                            children: [
-                              SensorCard(
-                                icon: Icons.thermostat_rounded,
-                                iconColor: Colors.deepOrange,
-                                titulo: "Temperatura do Ar",
-                                valor: "28°C",
-                              ),
-
-                              SensorCard(
-                                icon: Icons.cloud_queue_rounded,
-                                iconColor: Colors.lightBlue,
-                                titulo: "Umidade do Ar",
-                                valor: "64%",
-                              ),
-                            ],
-                          ),
-
-                          Wrap(
-                            spacing: 18,
-                            runSpacing: 18,
-                            alignment: WrapAlignment.center,
-
-                            children: [
-                              InfoCard(
-                                icon: Icons.energy_savings_leaf_rounded,
-                                iconColor: AppTheme.mainGreen,
-                                texto: "Estação do ano: $_season",
-                              ),
-
-                              InfoCard(
-                                icon: Icons.wb_twilight_rounded,
-                                iconColor: AppTheme.mainGreen,
-                                texto: "Período do dia: $_dayPeriod",
-                              ),
-                            ],
-                          )
                         ],
                       ),
                     ),
