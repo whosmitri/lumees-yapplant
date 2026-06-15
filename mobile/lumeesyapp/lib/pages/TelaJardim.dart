@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
+import '../widgets/card_sensor.dart';
+import '../widgets/card_info.dart';
+
 class TelaJardim extends StatelessWidget {
   const TelaJardim({super.key});
 
@@ -124,7 +127,69 @@ class TelaJardim extends StatelessWidget {
                           ),
                           const SizedBox(height: 24),
                           
-                          // CARDS ENTRAM AQUI, aoba !!
+                          Wrap(
+                            spacing: 18,
+                            runSpacing: 18,
+                            alignment: WrapAlignment.center,
+
+                            children: [
+                              SensorCard(
+                                icon: Icons.water_drop_rounded,
+                                iconColor: Colors.blue,
+                                titulo: "Umidade do Solo",
+                                valor: "20%",
+                              ),
+
+                              SensorCard(
+                                icon: Icons.wb_sunny_rounded,
+                                iconColor: Colors.amber,
+                                titulo: "Luminosidade",
+                                valor: "3000 lx",
+                              ),
+                            ],
+                          ),
+
+                          Wrap(
+                            spacing: 18,
+                            runSpacing: 18,
+                            alignment: WrapAlignment.center,
+
+                            children: [
+                              SensorCard(
+                                icon: Icons.thermostat_rounded,
+                                iconColor: Colors.deepOrange,
+                                titulo: "Temperatura do Ar",
+                                valor: "28°C",
+                              ),
+
+                              SensorCard(
+                                icon: Icons.cloud_queue_rounded,
+                                iconColor: Colors.lightBlue,
+                                titulo: "Umidade do Ar",
+                                valor: "64%",
+                              ),
+                            ],
+                          ),
+
+                          Wrap(
+                            spacing: 18,
+                            runSpacing: 18,
+                            alignment: WrapAlignment.center,
+
+                            children: [
+                              InfoCard(
+                                icon: Icons.energy_savings_leaf_rounded,
+                                iconColor: AppTheme.mainGreen,
+                                texto: "Estação do ano: Outono",
+                              ),
+
+                              InfoCard(
+                                icon: Icons.wb_twilight_rounded,
+                                iconColor: AppTheme.mainGreen,
+                                texto: "Período do dia: Dia",
+                              ),
+                            ],
+                          )
                         ],
                       ),
                     ),
