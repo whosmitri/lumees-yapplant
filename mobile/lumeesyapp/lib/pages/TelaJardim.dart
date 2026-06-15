@@ -30,6 +30,9 @@ class _TelaJardimState extends State<TelaJardim> {
   String _season = "...";
   String _dayPeriod = "...";
 
+  Map<String, dynamic>? _especie;
+  String? _ultimaEspecieCarregada;
+
   @override
   void initState() {
     super.initState();
@@ -66,6 +69,108 @@ class _TelaJardimState extends State<TelaJardim> {
     }
   }
 
+  Future<void> _carregarEspecie(String idEspecie) async {
+    // Condição corrigida para buscar a espécie apenas quando realmente muda
+    if (_ultimaEspecieCarregada == idEspecie) {
+      return;
+    }
+
+    _ultimaEspecieCarregada = idEspecie;
+
+    final especieObtida = await _databaseService.obterEspeciePorId(idEspecie);
+
+    if (mounted) {
+      setState(() {
+        _especie = especieObtida;
+      });
+    }
+  }
+
+  // define limite mínimo de umidade do solo
+  int _limiteUmidadeMinima() {
+    if (_especie == null) return 0;
+
+    if (_season == SeasonService.summer ||
+        _season == SeasonService.spring) {
+      return _especie!['limite_umidade_verao_minimo'] ?? 0;
+    }
+
+    return _especie!['limite_umidade_inverno_minimo'] ?? 0;
+  }
+
+  // define limite máximo de umidade do solo
+  int _limiteUmidadeMaxima() {
+    if (_especie == null) return 100;
+
+    if (_season == SeasonService.summer ||
+        _season == SeasonService.spring) {
+      return _especie!['limite_umidade_verao_maximo'] ?? 100;
+    }
+
+    return _especie!['limite_umidade_inverno_maximo'] ?? 100;
+  }
+
+  // define limite mínimo de lux
+  int _limiteLuxMinimo() {
+    if (_especie == null) return 0;
+
+    return _especie!['limite_lux_minimo'] ?? 0;
+  }
+
+  // define limite máximo de lux
+  int _limiteLuxMaximo() {
+    if (_especie == null) return 999999;
+
+    return _especie!['limite_lux_maximo'] ?? 999999;
+  }
+
+  // MÉTODOS DE CHECAGEM DO ESTADO ATUAL (retorna frase + imagem)
+  Map<String, String> _obterEstadoPlanta(Map<String, dynamic> planta) {
+    if (_especie == null) {
+      return {
+        'frase': "Carregando...",
+        'imagem': "assets/images/estados_planta/estado-normal.png",
+      };
+    }
+
+    // conversão segura para int (evita quebra por conflito de double/int vindos do banco)
+    final int umidadeAtual = (planta['ultima_leitura']['umidade_solo_porcentagem'] as num? ?? 0).toInt();
+    final int luxAtual = (planta['ultima_leitura']['luminosidade'] as num? ?? 0).toInt();
+
+    final int uMin = _limiteUmidadeMinima();
+    final int uMax = _limiteUmidadeMaxima();
+    final int lMin = _limiteLuxMinimo();
+    final int lMax = _limiteLuxMaximo();
+
+    // árvore de decisão por prioridade (água > luz)
+    if (umidadeAtual > uMax) {
+      return {
+        'frase': "Estou encharcada!",
+        'imagem': "assets/images/estados_planta/estado-encharcado.png",
+      };
+    } else if (umidadeAtual < uMin) {
+      return {
+        'frase': "Estou com sede!",
+        'imagem': "assets/images/estados_planta/estado-sede.png",
+      };
+    } else if (luxAtual > lMax) {
+      return {
+        'frase': "Estou com calor!",
+        'imagem': "assets/images/estados_planta/estado-calor.png",
+      };
+    } else if (luxAtual < lMin) {
+      return {
+        'frase': "Estou com frio...",
+        'imagem': "assets/images/estados_planta/estado-frio.png",
+      };
+    } else {
+      return {
+        'frase': "Estou bem!!",
+        'imagem': "assets/images/estados_planta/estado-normal.png",
+      };
+    }
+  }
+
   @override
   Widget build(BuildContext context) {    
     final size = MediaQuery.of(context).size;
@@ -92,7 +197,7 @@ class _TelaJardimState extends State<TelaJardim> {
     return Scaffold(
       backgroundColor: AppTheme.mainIvory,
 
-      
+
       // APP BAR
       appBar: AppBar(
         backgroundColor: AppTheme.mainIvory,
@@ -100,7 +205,7 @@ class _TelaJardimState extends State<TelaJardim> {
         title: const Text("Bem-vindo!!"),
       ),
 
-      
+
       // BODY
       body: SafeArea(
         child: LayoutBuilder(
@@ -111,187 +216,191 @@ class _TelaJardimState extends State<TelaJardim> {
             // o espaço do background será tudo menos o painel (com uma pequena folga para a curva do topo)
             final double bgAltura = constraints.maxHeight - painelAltura + 30;
 
-            return Stack(
-              children: [
-                
-                // BACKGROUND DINÂMICO
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: bgAltura, // cresce ou diminui baseado no tamanho da tela
-                  child: Image.asset(
-                    _dayPeriod == "Dia"
-                      ? "assets/images/bgs/bg_principal_dia.png"
-                      : "assets/images/bgs/bg_principal_noite.png",
-                    fit: BoxFit.cover,
-                  ),
-                ),
+            // O STREAMBUILDER FOI MOVIDO PARA CÁ: agora ele envolve todo stack do jardim !!
+            return StreamBuilder(
+              stream: _databaseService.buscarPlanta(user.uid),
+              builder: (context, snapshot) {
 
-                
-                // IMAGEM DA PLANTINHA (centralizada na área do background)
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: painelAltura - 20, // garante que a planta fique acima do painel
-                  child: Center(
-                    child: SizedBox(
-                      width: imagemLargura,
-                      height: imagemAltura,
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(
+                    child: Text("Nenhuma planta cadastrada."),
+                  );
+                }
+
+                final planta = snapshot.data!.docs.first.data();
+                final idEspecie = planta['id_especie'];
+
+                if (_especie == null || _especie!['id_especie'] != idEspecie) {
+                  _carregarEspecie(idEspecie);
+                }
+
+                // obtém dinamicamente o mapa com a frase e a imagem corretas
+                final estadoAtual = _obterEstadoPlanta(planta);
+
+                return Stack(
+                  children: [
+                    
+                    // BACKGROUND DINÂMICO
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: bgAltura, // cresce ou diminui baseado no tamanho da tela
                       child: Image.asset(
-                        "assets/images/estados_planta/estado-normal.png",
-                        fit: BoxFit.contain,
+                        _dayPeriod == "Dia"
+                          ? "assets/images/bgs/bg_principal_dia.png"
+                          : "assets/images/bgs/bg_principal_noite.png",
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  ),
-                ),
 
-                
-                // BALÃO DE FALA (ajustado em relação à planta)
-                Positioned(
-                  top: bgAltura * 0.15, // posiciona a 15% do topo da área visível do fundo
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Container(
-                      width: 180,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        "Estou bem!!",
-                        style: AppTheme.titleSmall,
-                      ),
-                    ),
-                  ),
-                ),
-
-                
-                // PAINEL INFERIOR FLUTUANTE
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: painelAltura, // altura dinâmica baseada na proporção da tela
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: AppTheme.auxSand,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
-                      ),
-                    ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(24, 30, 24, 24),
-
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // TÍTULO
-                          const Text(
-                            "Ambiente",
-                            style: AppTheme.titleMedium,
+                    // IMAGEM DA PLANTINHA
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: painelAltura - 20, // garante que a planta fique acima do painel
+                      child: Center(
+                        child: SizedBox(
+                          width: imagemLargura,
+                          height: imagemAltura,
+                          child: Image.asset(
+                            estadoAtual['imagem']!, // <--- Caminho dinâmico baseado na regra
+                            fit: BoxFit.contain,
                           ),
-                          const SizedBox(height: 24),
+                        ),
+                      ),
+                    ),
 
-                          StreamBuilder(
-                            stream: _databaseService.buscarPlanta(user.uid),
-                            builder: (context, snapshot) {
+                    // BALÃO DE FALA
+                    Positioned(
+                      top: bgAltura * 0.15, // posiciona a 15% do topo da área visível do fundo
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: Container(
+                          width: 180,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            estadoAtual['frase']!, // frase dinâmica baseada na regra
+                            style: AppTheme.titleSmall,
+                          ),
+                        ),
+                      ),
+                    ),
 
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
 
-                              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                                return const Text(
-                                  "Nenhuma planta cadastrada.",
-                                );
-                              }
+                    // PAINEL INFERIOR FLUTUANTE
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: painelAltura, // altura dinâmica baseada na proporção da tela
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: AppTheme.auxSand,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30),
+                          ),
+                        ),
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(24, 30, 24, 24),
+                          
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // TÍTULO
+                              const Text(
+                                "Ambiente",
+                                style: AppTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 24),
 
-                              final planta = snapshot.data!.docs.first.data();
+                              // EXIBIÇÃO DIRETA DOS CARDS ATUALIZADOS PELO STREAM SUPERIOR
+                              Wrap(
+                                spacing: 18,
+                                runSpacing: 18,
+                                alignment: WrapAlignment.center,
 
-                              return Column(
                                 children: [
-                                  Wrap(
-                                    spacing: 18,
-                                    runSpacing: 18,
-                                    alignment: WrapAlignment.center,
-
-                                    children: [
-                                      SensorCard(
-                                        icon: Icons.water_drop_rounded,
-                                        iconColor: Colors.blue,
-                                        titulo: "Umidade do Solo",
-                                        valor:"${planta['ultima_leitura']['umidade_solo_porcentagem']}%",
-                                      ),
-
-
-                                      SensorCard(
-                                        icon: Icons.wb_sunny_rounded,
-                                        iconColor: Colors.amber,
-                                        titulo: "Luminosidade",
-                                        valor: "${planta['ultima_leitura']['luminosidade']} lx",
-                                      ),
-                                    ],
+                                  SensorCard(
+                                    icon: Icons.water_drop_rounded,
+                                    iconColor: Colors.blue,
+                                    titulo: "Umidade do Solo",
+                                    valor: "${planta['ultima_leitura']['umidade_solo_porcentagem']}%",
                                   ),
 
-                                  Wrap(
-                                    spacing: 18,
-                                    runSpacing: 18,
-                                    alignment: WrapAlignment.center,
 
-                                    children: [
-                                      SensorCard(
-                                        icon: Icons.thermostat_rounded,
-                                        iconColor: Colors.deepOrange,
-                                        titulo: "Temperatura do Ar",
-                                        valor: "${planta['ultima_leitura']['temperatura_ar']}°C",
-                                      ),
-
-                                      SensorCard(
-                                        icon: Icons.cloud_queue_rounded,
-                                        iconColor: Colors.lightBlue,
-                                        titulo: "Umidade do Ar",
-                                        valor: "${planta['ultima_leitura']['umidade_ar']}%",
-                                      ),
-                                    ],
+                                  SensorCard(
+                                    icon: Icons.wb_sunny_rounded,
+                                    iconColor: Colors.amber,
+                                    titulo: "Luminosidade",
+                                    valor: "${planta['ultima_leitura']['luminosidade']} lx",
                                   ),
-
-                                  Wrap(
-                                    spacing: 18,
-                                    runSpacing: 18,
-                                    alignment: WrapAlignment.center,
-
-                                    children: [
-                                      InfoCard(
-                                        icon: Icons.energy_savings_leaf_rounded,
-                                        iconColor: AppTheme.mainGreen,
-                                        texto: "Estação do ano: $_season",
-                                      ),
-
-                                      InfoCard(
-                                        icon: Icons.wb_twilight_rounded,
-                                        iconColor: AppTheme.mainGreen,
-                                        texto: "Período do dia: $_dayPeriod",
-                                      ),
-                                    ],
-                                  )
                                 ],
-                              );
-                            },
+                              ),
+
+                              Wrap(
+                                spacing: 18,
+                                runSpacing: 18,
+                                alignment: WrapAlignment.center,
+
+                                children: [
+                                  SensorCard(
+                                    icon: Icons.thermostat_rounded,
+                                    iconColor: Colors.deepOrange,
+                                    titulo: "Temperatura do Ar",
+                                    valor: "${planta['ultima_leitura']['temperatura_ar']}°C",
+                                  ),
+
+                                  SensorCard(
+                                    icon: Icons.cloud_queue_rounded,
+                                    iconColor: Colors.lightBlue,
+                                    titulo: "Umidade do Ar",
+                                    valor: "${planta['ultima_leitura']['umidade_ar']}%",
+                                  ),
+                                ],
+                              ),
+
+                              Wrap(
+                                spacing: 18,
+                                runSpacing: 18,
+                                alignment: WrapAlignment.center,
+
+                                children: [
+                                  InfoCard(
+                                    icon: Icons.energy_savings_leaf_rounded,
+                                    iconColor: AppTheme.mainGreen,
+                                    texto: "Estação do ano: $_season",
+                                  ),
+
+                                  InfoCard(
+                                    icon: Icons.wb_twilight_rounded,
+                                    iconColor: AppTheme.mainGreen,
+                                    texto: "Período do dia: $_dayPeriod",
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ],
+                  ],
+                );
+              },
             );
           },
         ),

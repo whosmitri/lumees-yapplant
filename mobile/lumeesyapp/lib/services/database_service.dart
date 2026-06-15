@@ -110,4 +110,19 @@ class DatabaseService {
         .where('uid', isEqualTo: uid)
         .snapshots();
   }
+
+  // ESPÉCIES
+  Future<Map<String, dynamic>?> obterEspeciePorId(String idEspecie) async {
+    try {
+      final doc = await _db
+          .collection(_especies)
+          .doc(idEspecie)
+          .get();
+
+      return doc.data();
+
+    } catch (_) {
+      return null;
+    }
+  }
 }
