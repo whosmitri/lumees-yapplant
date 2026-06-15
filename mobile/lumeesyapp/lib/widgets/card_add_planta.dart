@@ -92,7 +92,7 @@ class _CardAddPlantaState extends State<CardAddPlanta> {
 
     Navigator.pushNamedAndRemoveUntil(
       context,
-      '/principal',
+      '/jardim',
       (_) => false,
     );
   }
