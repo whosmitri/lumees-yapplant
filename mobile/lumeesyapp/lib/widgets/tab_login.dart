@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
+
 import '../theme/app_theme.dart';
 
 class TabLogin extends StatefulWidget {
@@ -11,7 +13,39 @@ class TabLogin extends StatefulWidget {
 
 class TabLoginState extends State<TabLogin> {
 
+  final AuthService _authService = AuthService();
+
+  String email = '';
+  String senha = '';
+
+  bool carregando = false;
   bool mostrarSenha = false;
+
+  Future<void> _entrar() async {
+    if (!_validarFormulario()) return;
+
+    setState(() {
+      carregando = true;
+    });
+
+    final resultado = await _authService.logarUsuario(
+      email: email,
+      senha: senha,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      carregando = false;
+    });
+
+    if (!resultado.sucesso) {
+      _mostrarMensagem(resultado.mensagem!);
+      return;
+    }
+
+    // a etapa 5 (verificar se o user tem plantinha) vai ficar aqui (pelo menos até onde eu planejei)
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +78,7 @@ class TabLoginState extends State<TabLogin> {
           _campoTexto(
             label: 'E-mail',
             keyboardType: TextInputType.emailAddress,
+            onChanged: (value) => email = value,
           ),
 
           const SizedBox(height: 16),
@@ -67,6 +102,8 @@ class TabLoginState extends State<TabLogin> {
                 });
               },
             ),
+
+            onChanged: (value) => senha = value,
           ),
 
           const SizedBox(height: 24),
@@ -76,7 +113,7 @@ class TabLoginState extends State<TabLogin> {
             width: double.infinity,
 
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: carregando ? null : _entrar,
 
               child: const Text(
                 'Entrar',
@@ -95,10 +132,12 @@ class TabLoginState extends State<TabLogin> {
     bool obscureText = false,
     Widget? suffixIcon,
     TextInputType keyboardType = TextInputType.text,
+    ValueChanged<String>? onChanged,
   }) {
     return TextField(
       keyboardType: keyboardType,
       obscureText: obscureText,
+      onChanged: onChanged,
 
       decoration: InputDecoration(
         labelText: label,
@@ -143,5 +182,32 @@ class TabLoginState extends State<TabLogin> {
         ),
       ),
     );
+  }
+
+  void _mostrarMensagem(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+      ),
+    );
+  }
+
+  bool _validarFormulario() {
+    if (email.trim().isEmpty) {
+      _mostrarMensagem('Informe o e-mail.');
+      return false;
+    }
+
+    if (!email.contains('@')) {
+      _mostrarMensagem('Informe um e-mail válido.');
+      return false;
+    }
+
+    if (senha.isEmpty) {
+      _mostrarMensagem('Informe a senha.');
+      return false;
+    }
+
+    return true;
   }
 }
