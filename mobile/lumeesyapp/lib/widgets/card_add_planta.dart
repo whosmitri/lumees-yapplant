@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
+import '../services/database_service.dart';
+
 import '../theme/app_theme.dart';
 
 class CardAddPlanta extends StatefulWidget {
@@ -11,10 +14,88 @@ class CardAddPlanta extends StatefulWidget {
 
 class _CardAddPlantaState extends State<CardAddPlanta> {
 
+  final AuthService _authService = AuthService();
+  final DatabaseService _databaseService = DatabaseService();
+
   String? especie;
 
   String nome = '';
   String macAddress = '';
+
+  List<Map<String, dynamic>> especies = [];
+
+  bool carregando = false;
+
+  Future<void> _carregarEspecies() async {
+    final resultado = await _databaseService.buscarEspecies();
+
+    if (!mounted) return;
+
+    setState(() {
+      especies = resultado;
+    });
+
+  }
+
+  @override
+    void initState() {
+      super.initState();
+      _carregarEspecies();
+    }
+  
+  Future<void> _cadastrarPlanta() async {
+    if (!_validarFormulario()) {
+      return;
+    }
+
+    final usuario = _authService.currentUser;
+
+    if (usuario == null) {
+      _mostrarMensagem(
+        'Usuário não encontrado.',
+      );
+      return;
+    }
+
+    setState(() {
+      carregando = true;
+    });
+
+    final idPlanta = await _databaseService.cadastrarPlanta(
+      uid: usuario.uid,
+      nomeApelido: nome,
+      idEspecie: especie!,
+      macHardware: macAddress,
+    );
+
+    if (idPlanta == null) {
+      setState(() {
+        carregando = false;
+      });
+
+      _mostrarMensagem(
+        'Erro ao cadastrar planta.',
+      );
+      return;
+    }
+
+    await _databaseService.atualizarIdPlantaUsuario(
+      uid: usuario.uid,
+      idPlanta: idPlanta,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      carregando = false;
+    });
+
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/principal',
+      (_) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,22 +163,15 @@ class _CardAddPlantaState extends State<CardAddPlanta> {
                   'Selecione sua planta',
                 ),
 
-                items: const [
-                  DropdownMenuItem(
-                    value: 'samambaia',
-                    child: Text('Samambaia'),
-                  ),
+                items: especies.map((item) {
+                return DropdownMenuItem<String>(
+                  value: item['nome_comum'],
 
-                  DropdownMenuItem(
-                    value: 'jiboia',
-                    child: Text('Jibóia'),
+                  child: Text(
+                    item['nome_comum'],
                   ),
-
-                  DropdownMenuItem(
-                    value: 'costela',
-                    child: Text('Costela-de-Adão'),
-                  ),
-                ],
+                );
+              }).toList(),
 
                 onChanged: (value) {
                   setState(() {
@@ -141,12 +215,21 @@ class _CardAddPlantaState extends State<CardAddPlanta> {
               SizedBox(
                 width: double.infinity,
 
+                // BOTÃO
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: carregando ? null : _cadastrarPlanta,
 
-                  child: const Text(
-                    'Cadastrar planta',
-                  ),
+                  child: carregando
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.mainIvory,
+                      ),
+                    )
+
+                  : const Text('Cadastrar planta'),
                 ),
               ),
             ],
@@ -217,6 +300,42 @@ class _CardAddPlantaState extends State<CardAddPlanta> {
           color: AppTheme.auxDanger,
           width: 2,
         ),
+      ),
+    );
+  }
+
+  bool _validarFormulario() {
+    if (especie == null) {
+      _mostrarMensagem(
+        'Selecione uma espécie.',
+      );
+
+      return false;
+    }
+
+    if (nome.trim().isEmpty) {
+      _mostrarMensagem(
+        'Informe um apelido.',
+      );
+
+      return false;
+    }
+
+    if (macAddress.trim().isEmpty) {
+      _mostrarMensagem(
+        'Informe o MAC Address.',
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
+  void _mostrarMensagem(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
       ),
     );
   }

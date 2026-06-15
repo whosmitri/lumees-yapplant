@@ -66,6 +66,7 @@ class DatabaseService {
     required String uid,
     required String nomeApelido,
     required String idEspecie,
+    required String macHardware
   }) async {
     try {
       final plantaRef = _db.collection(_plantas).doc();
@@ -75,6 +76,7 @@ class DatabaseService {
         'uid': uid,
         'nome_apelido': nomeApelido,
         'id_especie': idEspecie,
+        'mac_hardware': macHardware,
         'ultima_leitura': {
           'timestamp': null,
           'umidade_solo_bruto': 0,
