@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
+import '../pages/TelaDashboard.dart';
+//import '../pages/TelaAddPlanta.dart';
+
 import '../theme/app_theme.dart';
 
 class TabSignup extends StatefulWidget {
@@ -11,6 +15,9 @@ class TabSignup extends StatefulWidget {
 
 class TabSignupState extends State<TabSignup> {
 
+  // instanciando serviço
+  final AuthService _authService = AuthService();
+
   String nome = '';
   String email = '';
   String senha = '';
@@ -18,6 +25,39 @@ class TabSignupState extends State<TabSignup> {
 
   bool mostrarSenha = false;
   bool mostrarConfirmarSenha = false;
+
+  bool carregando = false;
+
+  Future<void> _cadastrar() async {
+    // primeiro valida os campos
+    if (!_validarFormulario()) return;
+
+    setState(() {
+      carregando = true;
+    });
+
+    final resultado = await _authService.cadastrarUsuario(
+      nome: nome,
+      email: email,
+      senha: senha,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      carregando = false;
+    });
+
+    if (!resultado.sucesso) {
+      _mostrarMensagem(resultado.mensagem!);
+      return;
+    }
+
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      '/dashboard',
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,14 +153,7 @@ class TabSignupState extends State<TabSignup> {
             width: double.infinity,
 
             child: ElevatedButton(
-              onPressed: () {
-                if (!_validarFormulario()) {
-                  return;
-                }
-                _mostrarMensagem(
-                  'Validação concluída com sucesso!'
-                );
-              },
+              onPressed: carregando ? null : _cadastrar,
 
               child: const Text('Criar Conta'),
             ),
