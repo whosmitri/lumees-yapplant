@@ -19,6 +19,10 @@ BH1750 lightMeter; // cria o objeto medidor pela biblioteca do Christopher Laws
 // CONFIGURAÇÃO DA API
 const char* url_api = "https://lumees-yapplant.onrender.com/lumees-api/v1/hardware/coleta"; // em "/lumees-api/v1/hardware/coleta"
 
+// CONFIGURAÇÃO DO DEEP SLEEP
+#define FATOR_CONVERSAO_MICROSEGUNDOS 1000000 // 1 segundo = 1.000.000 microsegundos
+#define TEMPO_DORMIR_SEGUNDOS  600 // 600 segundos = 10 minutos
+
 // VARIÁVEIS GLOBAIS DE LEITURA
 String macHardware = ""; // variável para guardar o endereço MAC
 float umidadeSoloBruto = 0.0; // umidade do solo em valor analógico
@@ -106,15 +110,17 @@ void loop() {
     temperaturaAr = dht.readTemperature();
     umidadeAr = dht.readHumidity();
 
-    // 3. LEITURA DO BH1750 (LUMINOSIDADE EM LUX)
-    luxLuminosidade = lightMeter.readLightLevel();
-
-    // 4. VALIDAÇÃO DE LEITURAS (se o DHT falhar)
+    // 3. VALIDAÇÃO DE LEITURAS (se o DHT falhar)
     if (isnan(temperaturaAr) || isnan(umidadeAr)) {
       Serial.println("Falha ao ler o sensor DHT11! Mantendo valores zerados.");
       temperaturaAr = 0.0;
       umidadeAr = 0.0;
     }
+
+    // 4. LEITURA DO BH1750 (modo One-Time limpa o sensor e faz a leitura real)
+    lightMeter.begin(BH1750::ONE_TIME_HIGH_RES_MODE);
+    delay(180); // aguarda o sensor processar a luz física antes de ler
+    luxLuminosidade = lightMeter.readLightLevel();
 
     // 5. EXIBIÇÃO DOS DADOS FORMATADOS NO MONITOR SERIAL
     Serial.println("=====================================");
@@ -173,6 +179,16 @@ void loop() {
     Serial.println("Wi-Fi desconectado! Tentando reconectar automaticamente...");
   }
 
-  // 10 minutos de delay até a próxima leitura
-  delay(600000); 
+  // entre em deep sleep por 10 minutos até a próxima leitura
+  irParaDeepSleep();
+}
+
+// função auxiliar para ativar o Deep Sleep de forma limpa
+void irParaDeepSleep() {
+  Serial.println("Desconectando o Wi-Fi para dormir de forma segura...");
+  WiFi.disconnect(true);
+  
+  Serial.println("Entrando em Deep Sleep por 10 minutos agora. Até logo!");
+  esp_sleep_enable_timer_wakeup(TEMPO_DORMIR_SEGUNDOS * FATOR_CONVERSAO_MICROSEGUNDOS);
+  esp_deep_sleep_start();
 }
