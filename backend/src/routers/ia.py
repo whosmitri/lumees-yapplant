@@ -178,13 +178,6 @@ def analisar_planta(dados: RequisicaoAnalise):
     try:
         # salva no histórico de análises da planta
         ref_doc_planta.collection("analises_ia").add(resultado_final)
-        
-        # atualiza o status em tempo real na raiz do doc da planta
-        ref_doc_planta.update({
-            "ultimo_status_ia": status_bruto,
-            "texto_explicativo_ia": texto_explicativo,
-            "ultima_analise_ia": datetime.now(timezone.utc)
-        })
 
     except Exception as e:
         print(f"AVISO: Modelo analisou, mas falhou ao atualizar o doc da planta: {e}")
