@@ -168,7 +168,7 @@ class _TelaDiagnosticoState extends State<TelaDiagnostico> {
 
                   // TOPO
                   Image.asset(
-                    "assets/images/bgs/lee.png",
+                    "assets/images/lee/robot_lee.png",
                     height: 170,
                   ),
 
