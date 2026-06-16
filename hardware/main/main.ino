@@ -17,7 +17,7 @@ DHT dht(PIN_DHT, DHTTYPE); // cria o objeto do DHT11
 BH1750 lightMeter; // cria o objeto medidor pela biblioteca do Christopher Laws
 
 // CONFIGURAÇÃO DA API
-const char* url_api = ""; // em "/lumees-api/v1/hardware/coleta"
+const char* url_api = "https://lumees-yapplant.onrender.com/lumees-api/v1/hardware/coleta"; // em "/lumees-api/v1/hardware/coleta"
 
 // VARIÁVEIS GLOBAIS DE LEITURA
 String macHardware = ""; // variável para guardar o endereço MAC
