@@ -75,7 +75,7 @@ flutter:
     - assets/images/bgs/
     - assets/images/estados_planta/
     - assets/images/logo/
-    - assets/image/lee/
+    - assets/images/lee/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
