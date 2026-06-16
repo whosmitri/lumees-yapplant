@@ -52,7 +52,7 @@ class TabSignupState extends State<TabSignup> {
     }
 
     Navigator.of(context).pushNamedAndRemoveUntil(
-      '/dashboard',
+      '/add_planta',
       (route) => false,
     );
   }
