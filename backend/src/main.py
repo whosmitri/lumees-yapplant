@@ -8,21 +8,36 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.testclient import TestClient
 
 # configurando o ciclo de vida (Lifespan) para iniciar o firebase
+# configurando o ciclo de vida (Lifespan) para iniciar o firebase
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # executa QUANDO A API INICIA
     try:
-        # caminho para o arquivo de credenciais do firebase
+        # CAMINHO 1: Onde o arquivo fica computador (Local)
         CAMINHO_MAIN = os.path.dirname(os.path.abspath(__file__))
-        CAMINHO_JSON = os.path.join(CAMINHO_MAIN, "firebase-credentials.json")
+        CAMINHO_LOCAL = os.path.join(CAMINHO_MAIN, "firebase-credentials.json")
+        
+        # CAMINHO 2: Onde o Render guarda os Secret Files (Nuvem)
+        CAMINHO_RENDER = "/etc/secrets/firebase-credentials.json"
 
-        cred = credentials.Certificate(CAMINHO_JSON)
+        # lógica para decidir qual usar:
+        if os.path.exists(CAMINHO_RENDER):
+            caminho_final = CAMINHO_RENDER
+            print("Rodando na nuvem: Usando credenciais do Render!!")
+        elif os.path.exists(CAMINHO_LOCAL):
+            caminho_final = CAMINHO_LOCAL
+            print("Rodando localmente: Usando credenciais do notebook!!")
+        else:
+            raise FileNotFoundError("Arquivo de credenciais não encontrado nem local e nem no Render.")
+
+        cred = credentials.Certificate(caminho_final)
         firebase_admin.initialize_app(cred)
         print("Firebase inicializado com sucesso!")
+        
     except Exception as e:
-        print(format(f"Erro ao inicializar o Firebase: {e}"))
+        print(f"Erro ao inicializar o Firebase: {e}")
     
-    yield  # Aqui a API fica rodando normalmente
+    yield  # aqui a API fica rodando normalmente
     
     # apenas notificando o encerramento
     print("Encerrando aplicação...")
