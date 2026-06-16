@@ -33,9 +33,9 @@ class AppBottomNavigation extends StatelessWidget {
         route = '/relatorio';
         break;
 
-      case 4:
-        oute = '/usuario';
-        break;
+      //case 4:
+      // route = '/usuario';
+      //  break;
 
       default:
         route = '/jardim';;

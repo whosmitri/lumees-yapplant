@@ -10,7 +10,7 @@ import 'pages/TelaDashboard.dart';
 import 'pages/TelaRelatorio.dart';
 import 'pages/TelaDiagnostico.dart';
 import 'pages/TelaAddPlanta.dart';
-import 'pages/TelaUsuario.dart';
+//import 'pages/TelaUsuario.dart';
 
 
 Future<void> main() async {
@@ -38,13 +38,14 @@ class LumeesApp extends StatelessWidget {
       home: const TelaHome(),
 
       routes: {
+        // adicionar depois
         '/autenticacao': (_) => const TelaAuth(),
         '/add_planta': (_) => const TelaAddPlanta(),
         '/jardim': (_) => const TelaJardim(),
         '/dashboard': (_) => const TelaDashboardWidget(),
         '/diagnostico': (_) => const TelaDiagnostico(),
         '/relatorio': (_) => const TelaRelatorio(),
-        '/usuario': (_) => const TelaUsuario(),
+        // // '/autenticacao': (_) => const TelaUsuario(),
       },
     );
   }
