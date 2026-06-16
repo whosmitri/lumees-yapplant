@@ -5,14 +5,13 @@ import 'package:http/http.dart' as http;
 // CONFIGURAÇÃO
 class ApiConfig {
   static const String baseUrl =
-    "http://127.0.0.1:8000/lumees-api/v1";
+    "https://lumees-yapplant.onrender.com/lumees-api/v1";
 }
 
 class ApiService {
   ApiService._();
 
   // MÉTODOS AUXILIARES
-
   static Uri _uri(String endpoint) {
     return Uri.parse("${ApiConfig.baseUrl}$endpoint");
   }
@@ -20,24 +19,14 @@ class ApiService {
   static Map<String, String> get _headers => {
         "Content-Type": "application/json",
       };
-
   
   // IA
-
-  static Future<Map<String, dynamic>> analisarPlanta() async {
-
-    /* BASE FIREBASE
-    final planta = await FirebaseService.obterPlantaSelecionada();
-
-    final idPlanta = planta.id;
-    final idEspecie = planta.idEspecie;
-    final estacaoAno = await LocalizacaoService.obterEstacaoAtual();
-    */
-
-    // MOCK
-    const idPlanta = "planta_001";
-    const idEspecie = "suculenta";
-    const estacaoAno = "Inverno";
+  // Agora a função exige os 3 parâmetros reais!
+  static Future<Map<String, dynamic>> analisarPlanta({
+    required String idPlanta,
+    required String idEspecie,
+    required String estacaoAno,
+  }) async {
 
     final response = await http.post(
       _uri("/ia/analise"),
@@ -57,5 +46,4 @@ class ApiService {
 
     throw Exception(body["detail"] ?? "Erro ao consultar Lee IA.");
   }
-
 }
