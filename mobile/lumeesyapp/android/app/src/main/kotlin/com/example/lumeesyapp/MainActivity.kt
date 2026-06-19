@@ -1,4 +1,4 @@
-package com.example.lumeesyapp
+package com.lumeesyapplant
 
 import io.flutter.embedding.android.FlutterActivity
 
