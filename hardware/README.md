@@ -20,9 +20,6 @@ O hardware coleta dados a cada **10 minutos**, otimizando consumo e persistênci
 | **DHT11** | VCC | 3V3 |
 |  | GND | GND |
 |  | DATA (Out) | GPIO 15 |
-| **BH1750** | SCL | GPIO 22 |
-|  | GND | GND |
-|  | SCL | GPIO 22 |
 | **BH1750** | VCC | 3V3 |
 |  | GND | GND |
 |  | SCL | GPIO 22 |
