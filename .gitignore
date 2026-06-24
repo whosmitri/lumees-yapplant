@@ -2,6 +2,7 @@
 *.json
 .env
 .env.local
+mobile/lumeesyapp/lib/firebase_options.dart
 
 # ignorar pastas de ambiente virtual e build
 venv/
