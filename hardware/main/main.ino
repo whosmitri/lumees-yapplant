@@ -180,15 +180,15 @@ void loop() {
   }
 
   // entre em deep sleep por 10 minutos até a próxima leitura
-  irParaDeepSleep();
+  modoSonequinha();
 }
 
 // função auxiliar para ativar o Deep Sleep de forma limpa
-void irParaDeepSleep() {
+void modoSonequinha() {
   Serial.println("Desconectando o Wi-Fi para dormir de forma segura...");
   WiFi.disconnect(true);
   
-  Serial.println("Entrando em Deep Sleep por 10 minutos agora. Até logo!");
+  Serial.println("Entrando em modo sonequinha profunda por 10 minutos agora. Até logo!");
   esp_sleep_enable_timer_wakeup(TEMPO_DORMIR_SEGUNDOS * FATOR_CONVERSAO_MICROSEGUNDOS);
   esp_deep_sleep_start();
 }
