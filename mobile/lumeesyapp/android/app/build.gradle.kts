@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.lumeesyapplant"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -23,7 +23,7 @@ android {
         // versão mínima requerida (Android 8)
         minSdk = 26
         // "versão alvo" (Android 15)
-        targetSdk = 35
+        targetSdk = 36
 
         versionCode = flutter.versionCode
         versionName = flutter.versionName
