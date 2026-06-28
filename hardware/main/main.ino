@@ -8,7 +8,7 @@
 
 // MAPEAMENTO DE PINOS
 #define PIN_UMIDADE_SOLO 34 // pino do sensor de umidade de solo
-#define PIN_DHT 15 // pino do DHT11
+#define PIN_DHT 4 // pino do DHT11
 #define PIN_POWER_SENSORES 32 // pino para alimentar o VCC dos sensores
 
 // CONFIGURAÇÃO DOS SENSORES
@@ -51,7 +51,7 @@ void setup() {
   // 1. LIGA ENERGIA DOS SENSORES
   pinMode(PIN_POWER_SENSORES, OUTPUT);
   digitalWrite(PIN_POWER_SENSORES, HIGH);
-  delay(100); // dá um tempinho rápido para a energia estabilizar neles
+  delay(1500); // dá um tempinho rápido para a energia estabilizar neles
 
   // 2. iniciando o barramento I2C (Pinos nativos do ESP32: SDA=21, SCL=22)
   Wire.begin();
